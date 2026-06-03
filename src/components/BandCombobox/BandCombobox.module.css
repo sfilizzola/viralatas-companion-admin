@@ -1,0 +1,117 @@
+/* Wraps input + dropdown together */
+.root {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.input {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--charcoal);
+  border: 1px solid var(--rule-slate);
+  color: var(--bone);
+  font-family: var(--f-mono);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.15s;
+  min-width: 0;
+}
+
+.input:focus,
+.inputOpen {
+  border-color: var(--caramel);
+}
+
+.input::placeholder {
+  color: var(--bone-dim);
+}
+
+.input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  background: var(--charcoal);
+  border: 1px solid var(--caramel);
+  border-top: none;
+  list-style: none;
+  z-index: 50;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 7px 12px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  cursor: pointer;
+  border: none;
+  border-bottom: 1px solid rgba(63, 77, 96, 0.3);
+  background: transparent;
+  transition: background 0.1s;
+  letter-spacing: 0.02em;
+  color: var(--bone);
+  text-align: left;
+}
+
+.itemHighlighted {
+  background: rgba(217, 123, 44, 0.15);
+  color: var(--caramel);
+}
+
+.itemSelected {
+  background: rgba(217, 123, 44, 0.07);
+  color: var(--caramel-hot);
+}
+
+.itemName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.selectedMark {
+  color: var(--caramel);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+
+.pickCount {
+  color: var(--bone-dim);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.itemHighlighted .pickCount {
+  color: rgba(217, 123, 44, 0.7);
+}
+
+.noMatch {
+  padding: 10px 12px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  color: var(--bone-dim);
+  letter-spacing: 0.04em;
+  background: var(--charcoal);
+  border: 1px solid var(--rule-slate);
+  border-top: none;
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
