@@ -20,7 +20,9 @@ Replace the `ManageServants` stub with a full user management view. The godlike 
 - Each user card shows: avatar/initials, name, email, role badge, badge count, friend status
 - Inline editable fields: `role` (manager toggle), `is_friend` (toggle)
 - Delete any user except godlike (requires Edge Function)
-- Visual layout is deferred to a huashu-design prototype; this spec covers data, state, and behavior only
+- **Visual design:** Variant C — Command Strip (approved 2026-06-03)
+  - HTML prototype: `docs/superpowers/specs/assets/phase7-approved-design-variant-c.html`
+  - Screenshot: `docs/superpowers/specs/assets/phase7-approved-design-variant-c.png`
 
 ---
 

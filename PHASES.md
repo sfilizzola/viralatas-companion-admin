@@ -258,6 +258,12 @@ await supabase.from('user_badge_history').insert({
 
 **Full design spec:** `docs/superpowers/specs/2026-06-03-phase7-servants-of-metal-design.md`
 
+**Approved visual design:** Variant C — Command Strip (2026-06-03)
+- Each row is divided into bordered vertical zones: avatar · identity · role · badges · manager-toggle · friend-toggle · delete
+- Active toggle zones glow caramel with a top indicator bar
+- Zero border-radius throughout, consistent with the rest of the admin app
+- HTML prototype: `docs/superpowers/specs/assets/phase7-approved-design-variant-c.html`
+
 ### 7.1 List all users
 
 Fetch all users with their total badge count in a single query:
