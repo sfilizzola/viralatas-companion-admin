@@ -1,0 +1,68 @@
+.card {
+  background: var(--ink-soft);
+  border: 1px solid var(--rule);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.15s;
+}
+
+.card:hover {
+  border-color: rgba(242, 235, 222, 0.18);
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardId {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--bone-dim);
+}
+
+.cardStatus {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.statusReady   { color: #22c55e; }
+.statusActive  { color: var(--caramel); }
+.statusOff     { color: var(--bone-dim); }
+.statusLoading { color: var(--bone-soft); }
+.statusError   { color: #f87171; }
+
+.cardTitle {
+  font-family: var(--f-pop);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bone);
+  font-weight: 400;
+}
+
+.cardDescription {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--bone-soft);
+  letter-spacing: 0.02em;
+}
+
+.cardControls {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

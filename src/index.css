@@ -1,0 +1,98 @@
+/* ── Design tokens ───────────────────────────────────────────────── */
+:root {
+  --ink:        #0d0d10;
+  --ink-soft:   #1a1a1f;
+  --charcoal:   #2a2a30;
+  --slate:      #3f4d60;
+  --slate-deep: #2d3845;
+  --slate-mid:  #364455;
+  --bone:       #f2ebde;
+  --bone-soft:  #c8bfaf;
+  --bone-dim:   rgba(242, 235, 222, 0.45);
+  --caramel:    #d97b2c;
+  --caramel-hot:#f3953f;
+  --blood:      #c01e1e;
+  --rule:       rgba(242, 235, 222, 0.10);
+  --rule-slate: rgba(63, 77, 96, 0.6);
+
+  --f-body: "Space Grotesk", -apple-system, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, monospace;
+  --f-pop:  "Bungee", sans-serif;
+
+  --sidebar-w: 220px;
+  --topbar-h: 56px;
+}
+
+/* ── Reset ───────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  font-family: var(--f-body);
+  background: var(--ink);
+  color: var(--bone);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  font-family: var(--f-mono);
+  cursor: pointer;
+}
+
+input, textarea, select {
+  font-family: var(--f-mono);
+}
+
+/* ── Shared button primitives ────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--caramel);
+  background: transparent;
+  border: 1px solid var(--caramel);
+  transition: background 0.15s, color 0.15s;
+}
+.btn-primary:hover {
+  background: var(--caramel);
+  color: var(--ink);
+}
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.btn-primary:disabled:hover {
+  background: transparent;
+  color: var(--caramel);
+}
+
+.btn-destructive {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--blood);
+  background: transparent;
+  border: 1px solid var(--blood);
+  transition: background 0.15s, color 0.15s;
+}
+.btn-destructive:hover {
+  background: var(--blood);
+  color: var(--bone);
+}

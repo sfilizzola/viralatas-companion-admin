@@ -1,0 +1,183 @@
+.loading {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+}
+
+.loadingDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--caramel);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* ── Login view ────────────────────────────────────────────────── */
+.loginView {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at 40% 30%, rgba(63, 77, 96, 0.5), transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(217, 123, 44, 0.08), transparent 50%),
+    var(--ink);
+}
+
+.loginPanel {
+  width: 420px;
+  border: 1px solid var(--rule-slate);
+  background: var(--ink-soft);
+  position: relative;
+}
+
+.loginPanel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--caramel) 40%,
+    var(--caramel) 60%,
+    transparent
+  );
+}
+
+.loginHeader {
+  padding: 32px 32px 24px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logoMark {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--slate-deep);
+  border: 1px solid var(--rule-slate);
+  font-family: var(--f-pop);
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  color: var(--caramel);
+  flex-shrink: 0;
+}
+
+.loginHeader strong {
+  display: block;
+  font-family: var(--f-pop);
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+
+.loginHeader span {
+  display: block;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--caramel);
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+.loginBody {
+  padding: 28px 32px 32px;
+}
+
+.errorBanner {
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  background: rgba(192, 30, 30, 0.12);
+  border: 1px solid rgba(192, 30, 30, 0.4);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  color: #f87171;
+  letter-spacing: 0.04em;
+}
+
+.field {
+  margin-bottom: 18px;
+}
+
+.field label {
+  display: block;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--bone-dim);
+  margin-bottom: 8px;
+}
+
+.field input {
+  width: 100%;
+  padding: 11px 14px;
+  background: var(--charcoal);
+  border: 1px solid var(--rule-slate);
+  color: var(--bone);
+  font-family: var(--f-mono);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.field input:focus {
+  border-color: var(--caramel);
+}
+
+.field input::placeholder {
+  color: var(--bone-dim);
+}
+
+.loginBtn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 13px;
+  font-family: var(--f-pop);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: var(--caramel);
+  border: none;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.loginBtn:hover:not(:disabled) {
+  background: var(--caramel-hot);
+}
+
+.loginBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.loginNote {
+  margin-top: 20px;
+  text-align: center;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: var(--bone-dim);
+  letter-spacing: 0.06em;
+}
+
+.loginNote span {
+  color: var(--caramel);
+}

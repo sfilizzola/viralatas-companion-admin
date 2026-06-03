@@ -1,0 +1,51 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.track {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  background: var(--charcoal);
+  border: 1px solid var(--rule-slate);
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.track.on {
+  background: rgba(217, 123, 44, 0.25);
+  border-color: var(--caramel);
+}
+
+.knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  background: var(--bone-dim);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.track.on .knob {
+  transform: translateX(16px);
+  background: var(--caramel);
+}
+
+.label {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--bone-soft);
+  text-transform: uppercase;
+}

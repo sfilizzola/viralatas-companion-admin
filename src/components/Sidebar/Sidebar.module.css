@@ -1,0 +1,217 @@
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-w);
+  height: 100vh;
+  background: var(--slate-deep);
+  border-right: 1px solid var(--rule-slate);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+/* ── Logo ─────────────────────────────────────────────────────── */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 16px 18px;
+  border-bottom: 1px solid var(--rule-slate);
+}
+
+.logoMark {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--slate-mid);
+  border: 1px solid var(--rule-slate);
+  font-family: var(--f-pop);
+  font-size: 11px;
+  color: var(--caramel);
+  flex-shrink: 0;
+}
+
+.logoTitle {
+  display: block;
+  font-family: var(--f-pop);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bone);
+  line-height: 1.2;
+}
+
+.logoSub {
+  display: block;
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--caramel);
+  margin-top: 2px;
+}
+
+/* ── Connection status ────────────────────────────────────────── */
+.connectionStatus {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--rule-slate);
+}
+
+.connectionLabel {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--bone-soft);
+}
+
+/* ── Nav ──────────────────────────────────────────────────────── */
+.nav {
+  flex: 1;
+  padding: 16px 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navGroupLabel {
+  display: block;
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--bone-dim);
+  padding: 0 16px 8px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  color: var(--bone-soft);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  width: 100%;
+}
+
+.navItem:hover {
+  background: rgba(63, 77, 96, 0.5);
+  color: var(--bone);
+}
+
+.navItemActive {
+  background: rgba(217, 123, 44, 0.08);
+  border-left-color: var(--caramel);
+  color: var(--bone);
+}
+
+.navIcon {
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.navLabel {
+  flex: 1;
+}
+
+.navCount {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  color: var(--bone-dim);
+  letter-spacing: 0.06em;
+}
+
+/* ── Footer ───────────────────────────────────────────────────── */
+.footer {
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--rule-slate);
+}
+
+.footerUser {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.footerUserInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.footerEmail {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  color: var(--bone-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.footerBadge {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--caramel);
+}
+
+.signOutBtn {
+  width: 100%;
+  padding: 7px 12px;
+  background: transparent;
+  border: 1px solid var(--rule-slate);
+  color: var(--bone-dim);
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.signOutBtn:hover {
+  border-color: var(--blood);
+  color: var(--blood);
+}
+
+/* ── Status dots ──────────────────────────────────────────────── */
+.dotGreen {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+}
+
+.dotDim {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bone-dim);
+  flex-shrink: 0;
+}
+
+.dotCaramel {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--caramel);
+  flex-shrink: 0;
+}

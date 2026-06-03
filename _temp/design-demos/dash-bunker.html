@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Admin — Bunker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&family=Bungee&family=Rye&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:        #0d0d10;
+    --ink-soft:   #141418;
+    --ink-raised: #1a1a1f;
+    --charcoal:   #2a2a30;
+    --bone:       #f2ebde;
+    --bone-soft:  #c8bfaf;
+    --bone-dim:   rgba(242,235,222,.4);
+    --caramel:    #d97b2c;
+    --caramel-hot:#f3953f;
+    --blood:      #c01e1e;
+    --blood-bright:#e8261e;
+    --rule:       rgba(242,235,222,.1);
+    --rule-heavy: rgba(242,235,222,.2);
+
+    --f-body:    "Space Grotesk", -apple-system, sans-serif;
+    --f-mono:    "JetBrains Mono", ui-monospace, monospace;
+    --f-display: "Rye", serif;
+    --f-pop:     "Bungee", sans-serif;
+
+    --sidebar-w: 240px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: var(--f-body); background: var(--ink); color: var(--bone); -webkit-font-smoothing: antialiased; }
+
+  /* grain texture overlay */
+  .grain::before {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none; z-index: 10;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.3 0'/></filter><rect width='180' height='180' filter='url(%23n)'/></svg>");
+    mix-blend-mode: overlay; opacity: .45;
+  }
+
+  /* ── TOGGLE ── */
+  .view-toggle {
+    position: fixed; top: 14px; right: 14px; z-index: 999;
+    display: flex; gap: 6px;
+  }
+  .view-toggle button {
+    font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em;
+    padding: 6px 12px; border: 1px solid var(--rule-heavy);
+    background: var(--ink-raised); color: var(--bone-soft); cursor: pointer;
+    transition: all .15s;
+  }
+  .view-toggle button.active { background: var(--caramel); color: var(--ink); border-color: var(--caramel); }
+
+  /* ══ LOGIN ══════════════════════════════════════════════════════════ */
+  .login-view {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+    background: var(--ink);
+  }
+
+  /* Angled caramel beam behind panel */
+  .login-view::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%) skewX(-12deg);
+    width: 320px; height: 100%;
+    background: linear-gradient(180deg, rgba(217,123,44,.04), transparent 60%);
+    pointer-events: none;
+  }
+
+  .login-panel {
+    width: 440px; position: relative;
+    border: 2px solid var(--rule-heavy);
+    background: var(--ink-soft);
+    box-shadow: 8px 8px 0 var(--caramel);
+  }
+
+  .login-banner {
+    background: var(--blood);
+    padding: 12px 28px;
+    display: flex; align-items: center; gap: 14px;
+    border-bottom: 2px solid var(--rule-heavy);
+  }
+  .login-banner img { width: 42px; height: 42px; object-fit: contain; filter: brightness(0) invert(1); }
+  .login-banner-text strong { display: block; font-family: var(--f-pop); font-size: 18px; letter-spacing: .06em; text-transform: uppercase; color: var(--bone); }
+  .login-banner-text span { font-family: var(--f-mono); font-size: 10px; letter-spacing: .2em; color: rgba(242,235,222,.8); text-transform: uppercase; }
+
+  .access-stamp {
+    position: absolute; top: 12px; right: 12px;
+    font-family: var(--f-pop); font-size: 10px; letter-spacing: .15em;
+    border: 2px solid var(--caramel); color: var(--caramel);
+    padding: 3px 8px; transform: rotate(3deg);
+    text-transform: uppercase; pointer-events: none;
+  }
+
+  .login-body { padding: 32px 28px 28px; }
+
+  .login-tagline {
+    font-family: var(--f-display); font-size: 15px; color: var(--bone-dim);
+    margin-bottom: 22px; text-align: center; letter-spacing: .04em;
+  }
+
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block; font-family: var(--f-mono); font-size: 10px; letter-spacing: .2em;
+    text-transform: uppercase; color: var(--bone-dim); margin-bottom: 7px;
+  }
+  .field input {
+    width: 100%; padding: 12px 14px;
+    background: var(--charcoal); border: 2px solid var(--rule-heavy);
+    color: var(--bone); font-family: var(--f-mono); font-size: 14px; outline: none;
+    transition: border-color .15s;
+  }
+  .field input:focus { border-color: var(--caramel); }
+  .field input::placeholder { color: var(--bone-dim); }
+
+  .login-btn {
+    width: 100%; margin-top: 10px; padding: 15px;
+    font-family: var(--f-pop); font-size: 14px; letter-spacing: .1em;
+    text-transform: uppercase; background: var(--caramel); border: none;
+    color: var(--ink); cursor: pointer; transition: background .15s;
+  }
+  .login-btn:hover { background: var(--caramel-hot); }
+
+  .login-note {
+    margin-top: 14px; text-align: center;
+    font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em;
+    color: var(--bone-dim); text-transform: uppercase;
+  }
+
+  /* ══ DASHBOARD ══════════════════════════════════════════════════════ */
+  .dash-view { display: flex; height: 100vh; overflow: hidden; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-w); flex: 0 0 var(--sidebar-w);
+    background: var(--ink-soft);
+    border-right: 2px solid var(--rule-heavy);
+    display: flex; flex-direction: column; overflow: hidden;
+    position: relative;
+  }
+
+  /* Caramel stripe on sidebar top */
+  .sidebar::before {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--caramel);
+  }
+
+  .sidebar-head {
+    padding: 22px 20px 18px;
+    border-bottom: 1px solid var(--rule);
+    display: flex; align-items: center; gap: 12px; flex: 0 0 auto;
+  }
+  .sidebar-head img { width: 32px; height: 32px; object-fit: contain; }
+  .sidebar-head-text strong { display: block; font-family: var(--f-pop); font-size: 13px; letter-spacing: .06em; color: var(--bone); text-transform: uppercase; }
+  .sidebar-head-text span { font-family: var(--f-mono); font-size: 9px; letter-spacing: .2em; color: var(--caramel); text-transform: uppercase; margin-top: 2px; display: block; }
+
+  .sidebar-nav { flex: 1; overflow-y: auto; padding: 16px 0; }
+
+  .nav-section-label {
+    padding: 12px 20px 6px;
+    font-family: var(--f-mono); font-size: 9px; letter-spacing: .3em;
+    text-transform: uppercase; color: var(--bone-dim);
+  }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 10px 20px; cursor: pointer;
+    font-family: var(--f-pop); font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--bone-soft); transition: all .15s; user-select: none;
+    border-left: 3px solid transparent;
+    position: relative;
+  }
+  .nav-item:hover { color: var(--bone); background: rgba(217,123,44,.06); }
+  .nav-item.active {
+    color: var(--caramel);
+    background: rgba(217,123,44,.08);
+    border-left-color: var(--caramel);
+  }
+  .nav-glyph { font-size: 16px; }
+  .nav-count {
+    margin-left: auto; font-family: var(--f-mono); font-size: 10px;
+    color: var(--bone-dim); background: var(--charcoal); padding: 2px 6px;
+  }
+  .nav-item.active .nav-count { background: rgba(217,123,44,.2); color: var(--caramel); }
+
+  .sidebar-foot {
+    padding: 16px 20px; border-top: 1px solid var(--rule); flex: 0 0 auto;
+  }
+  .user-row { display: flex; align-items: center; gap: 10px; }
+  .user-badge {
+    font-family: var(--f-mono); font-size: 8px; letter-spacing: .15em;
+    background: var(--caramel); color: var(--ink); padding: 3px 7px; text-transform: uppercase;
+  }
+  .user-email { font-family: var(--f-mono); font-size: 10px; color: var(--bone-dim); margin-top: 5px; }
+  .logout-btn {
+    margin-top: 10px; width: 100%; padding: 8px;
+    font-family: var(--f-pop); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    background: transparent; border: 2px solid var(--rule-heavy);
+    color: var(--bone-dim); cursor: pointer; transition: all .15s;
+  }
+  .logout-btn:hover { border-color: var(--blood); color: var(--blood); }
+
+  /* ── Main Panel ── */
+  .main-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .panel-topbar {
+    height: 54px; flex: 0 0 54px;
+    padding: 0 28px;
+    border-bottom: 2px solid var(--rule-heavy);
+    background: var(--ink-soft);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .panel-breadcrumb {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--f-pop); font-size: 12px; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--bone-soft);
+  }
+  .panel-breadcrumb .sep { color: var(--rule-heavy); }
+  .panel-breadcrumb .current { color: var(--caramel); }
+
+  .panel-meta {
+    display: flex; align-items: center; gap: 16px;
+    font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em;
+    color: var(--bone-dim); text-transform: uppercase;
+  }
+  .live-badge {
+    background: var(--blood); color: var(--bone);
+    font-family: var(--f-mono); font-size: 9px; letter-spacing: .15em;
+    padding: 3px 8px; text-transform: uppercase;
+    animation: blink 2s step-end infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+  .panel-content { flex: 1; overflow-y: auto; padding: 28px; }
+
+  .section-header {
+    margin-bottom: 26px; padding-bottom: 18px;
+    border-bottom: 2px solid var(--rule-heavy);
+    display: flex; align-items: flex-end; justify-content: space-between;
+  }
+  .section-title-group { }
+  .section-kicker {
+    font-family: var(--f-mono); font-size: 10px; letter-spacing: .3em;
+    text-transform: uppercase; color: var(--caramel); margin-bottom: 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-kicker::before { content: "//"; font-size: 12px; }
+  .section-title { font-family: var(--f-display); font-size: 28px; color: var(--bone); text-transform: uppercase; letter-spacing: .04em; }
+  .section-desc { font-family: var(--f-mono); font-size: 11px; color: var(--bone-dim); margin-top: 4px; line-height: 1.5; max-width: 500px; }
+  .section-count {
+    font-family: var(--f-pop); font-size: 48px; color: var(--rule-heavy); line-height: 1;
+    user-select: none;
+  }
+
+  /* Cards */
+  .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  .fn-card {
+    background: var(--ink-raised);
+    border: 2px solid var(--rule-heavy);
+    padding: 18px;
+    position: relative;
+    transition: border-color .2s, transform .15s, box-shadow .15s;
+  }
+  .fn-card:hover {
+    border-color: var(--caramel);
+    transform: translate(-2px,-2px);
+    box-shadow: 6px 6px 0 rgba(217,123,44,.25);
+  }
+  .fn-card.danger:hover {
+    border-color: var(--blood);
+    box-shadow: 6px 6px 0 rgba(192,30,30,.25);
+  }
+
+  .fn-card-id {
+    position: absolute; top: 10px; right: 12px;
+    font-family: var(--f-mono); font-size: 9px; letter-spacing: .2em;
+    color: var(--bone-dim); text-transform: uppercase;
+  }
+
+  .fn-name { font-family: var(--f-pop); font-size: 15px; letter-spacing: .04em; text-transform: uppercase; color: var(--bone); margin-bottom: 6px; }
+  .fn-desc { font-family: var(--f-mono); font-size: 11px; color: var(--bone-dim); line-height: 1.5; margin-bottom: 16px; }
+
+  .fn-status {
+    display: inline-flex; align-items: center; gap: 5px; margin-bottom: 12px;
+    font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  }
+  .status-ok   { color: #22c55e; } .status-ok::before   { content: "●"; font-size: 7px; }
+  .status-warn { color: var(--caramel); } .status-warn::before { content: "◆"; font-size: 7px; }
+  .status-off  { color: var(--bone-dim); } .status-off::before  { content: "○"; font-size: 7px; }
+
+  .btn-action {
+    font-family: var(--f-pop); font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    padding: 9px 16px; background: transparent;
+    border: 2px solid var(--caramel); color: var(--caramel);
+    cursor: pointer; transition: all .15s;
+  }
+  .btn-action:hover { background: var(--caramel); color: var(--ink); }
+  .btn-action-blood { border-color: var(--blood); color: var(--blood); }
+  .btn-action-blood:hover { background: var(--blood); color: var(--bone); }
+
+  .input-row { display: flex; gap: 6px; margin-top: 8px; }
+  .fn-input {
+    flex: 1; padding: 8px 10px;
+    background: var(--charcoal); border: 2px solid var(--rule-heavy);
+    color: var(--bone); font-family: var(--f-mono); font-size: 12px; outline: none;
+    transition: border-color .15s;
+  }
+  .fn-input:focus { border-color: var(--caramel); }
+  .fn-input::placeholder { color: var(--bone-dim); }
+
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+  .toggle-label { font-family: var(--f-mono); font-size: 11px; color: var(--bone-soft); letter-spacing: .06em; }
+  .toggle {
+    width: 42px; height: 22px; border: 2px solid var(--rule-heavy);
+    background: var(--charcoal); position: relative; cursor: pointer; transition: all .2s;
+  }
+  .toggle.on { background: rgba(217,123,44,.15); border-color: var(--caramel); }
+  .toggle::after {
+    content: ""; position: absolute; top: 3px; left: 3px;
+    width: 12px; height: 12px; background: var(--bone-dim); transition: all .2s;
+  }
+  .toggle.on::after { transform: translateX(18px); background: var(--caramel); }
+
+  /* Scrollbar */
+  .panel-content::-webkit-scrollbar { width: 4px; }
+  .panel-content::-webkit-scrollbar-track { background: transparent; }
+  .panel-content::-webkit-scrollbar-thumb { background: var(--rule-heavy); }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="view-toggle">
+  <button class="active" onclick="show('dash')">Login</button>
+  <button onclick="show('dash')">Dashboard</button>
+</div>
+
+<!-- ════ LOGIN ════ -->
+<div id="view-login" class="login-view grain">
+  <div class="login-panel">
+    <div class="access-stamp">Restricted</div>
+    <div class="login-banner">
+      <img src="./logo.png" alt="">
+      <div class="login-banner-text">
+        <strong>Vira-Latas Admin</strong>
+        <span>Backstage Access Only</span>
+      </div>
+    </div>
+    <div class="login-body">
+      <div class="login-tagline">Enter your credentials to proceed</div>
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" placeholder="you@viralatas.org" value="sfilizzola@gmail.com">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" placeholder="••••••••••••">
+      </div>
+      <button class="login-btn">🤘 Access the Bunker</button>
+      <p class="login-note">Godlike users only · Unauthorized access will be prosecuted by riffs</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════ DASHBOARD ════ -->
+<div id="view-dash" class="dash-view hidden">
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <img src="./logo.png" alt="">
+      <div class="sidebar-head-text">
+        <strong>Admin</strong>
+        <span>Vira-Latas</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Command Sections</div>
+      <div class="nav-item active" onclick="setNav(this)">
+        <span class="nav-glyph">⚡</span>
+        Testing Tools
+        <span class="nav-count">6</span>
+      </div>
+      <div class="nav-item" onclick="setNav(this)">
+        <span class="nav-glyph">⊞</span>
+        Data Management
+        <span class="nav-count">2</span>
+      </div>
+      <div class="nav-item" onclick="setNav(this)">
+        <span class="nav-glyph">◈</span>
+        Badge Testing
+        <span class="nav-count">1</span>
+      </div>
+      <div class="nav-item danger" onclick="setNav(this)">
+        <span class="nav-glyph">⊙</span>
+        User Management
+        <span class="nav-count">1</span>
+      </div>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user-row">
+        <span class="user-badge">Godlike</span>
+      </div>
+      <div class="user-email">sfilizzola@gmail.com</div>
+      <button class="logout-btn">Sign out</button>
+    </div>
+  </aside>
+
+  <div class="main-panel">
+    <div class="panel-topbar">
+      <div class="panel-breadcrumb">
+        <span>Admin</span>
+        <span class="sep">›</span>
+        <span class="current">Testing Tools</span>
+      </div>
+      <div class="panel-meta">
+        <span class="live-badge">● Live</span>
+        <span>Wacken 2026 · T−53d</span>
+        <span>Supabase · OK</span>
+      </div>
+    </div>
+
+    <div class="panel-content">
+      <div class="section-header">
+        <div class="section-title-group">
+          <div class="section-kicker">Section A</div>
+          <div class="section-title">Testing Tools</div>
+          <div class="section-desc">Trigger events, configure test modes, and validate features across the crew app.</div>
+        </div>
+        <div class="section-count">06</div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="fn-card">
+          <span class="fn-card-id">A-01</span>
+          <div class="fn-name">Test Quack</div>
+          <div class="fn-desc">Send a test duck notification to self. 15-second cooldown enforced server-side.</div>
+          <div class="fn-status status-ok">Ready</div>
+          <div><button class="btn-action">Send Quack →</button></div>
+        </div>
+
+        <div class="fn-card">
+          <span class="fn-card-id">A-02</span>
+          <div class="fn-name">Test Push</div>
+          <div class="fn-desc">Invoke send-test-push Edge Function. Web push notification to your device.</div>
+          <div class="fn-status status-ok">Ready</div>
+          <div><button class="btn-action">Fire Push →</button></div>
+        </div>
+
+        <div class="fn-card">
+          <span class="fn-card-id">A-03</span>
+          <div class="fn-name">Time Travel</div>
+          <div class="fn-desc">Shift festival date forward/backward to test schedules and badge conditions.</div>
+          <div class="fn-status status-warn">Shift active +3d</div>
+          <div class="input-row">
+            <input class="fn-input" type="number" placeholder="±days" value="+3">
+            <button class="btn-action">Apply</button>
+          </div>
+        </div>
+
+        <div class="fn-card">
+          <span class="fn-card-id">A-04</span>
+          <div class="fn-name">Live Band Test</div>
+          <div class="fn-desc">Override which band is "live now" for presence and alert testing.</div>
+          <div class="fn-status status-off">Off</div>
+          <div class="input-row">
+            <input class="fn-input" placeholder="Band ID…">
+            <button class="btn-action">Set</button>
+          </div>
+          <div class="toggle-row" style="margin-top:10px">
+            <span class="toggle-label">Test mode</span>
+            <span class="toggle" onclick="this.classList.toggle('on')"></span>
+          </div>
+        </div>
+
+        <div class="fn-card">
+          <span class="fn-card-id">A-05</span>
+          <div class="fn-name">Metal Place Test</div>
+          <div class="fn-desc">Toggle metal place test mode and configure test zone radius.</div>
+          <div class="fn-status status-ok">Enabled</div>
+          <div class="toggle-row">
+            <span class="toggle-label">Test mode active</span>
+            <span class="toggle on" onclick="this.classList.toggle('on')"></span>
+          </div>
+          <div class="input-row" style="margin-top:10px">
+            <input class="fn-input" placeholder="Zone radius (m)" value="50">
+            <button class="btn-action">Update</button>
+          </div>
+        </div>
+
+        <div class="fn-card">
+          <span class="fn-card-id">A-06</span>
+          <div class="fn-name">Feature Flags</div>
+          <div class="fn-desc">Toggle duck notifications globally. Changes affect all users immediately.</div>
+          <div class="fn-status status-ok">Duck notifs: ON</div>
+          <div class="toggle-row">
+            <span class="toggle-label">Duck notifications</span>
+            <span class="toggle on" onclick="this.classList.toggle('on')"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function show(view) {
+    document.getElementById('view-login').classList.toggle('hidden', view !== 'login');
+    document.getElementById('view-dash').classList.toggle('hidden', view !== 'dash');
+    document.querySelectorAll('.view-toggle button').forEach((b,i) => {
+      b.classList.toggle('active', (i===0&&view==='login')||(i===1&&view==='dash'));
+    });
+  }
+  function setNav(el) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+  }
+</script>
+</body>
+</html>

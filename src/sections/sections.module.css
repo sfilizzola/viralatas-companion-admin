@@ -1,0 +1,101 @@
+.sectionHeader {
+  margin-bottom: 24px;
+}
+
+.sectionTitle {
+  font-family: var(--f-pop);
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bone);
+  font-weight: 400;
+  margin-bottom: 6px;
+}
+
+.sectionDesc {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  color: var(--bone-soft);
+  letter-spacing: 0.03em;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+/* ── Shared input primitives ─────────────────────────────────── */
+.inputRow {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.monoInput {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--charcoal);
+  border: 1px solid var(--rule-slate);
+  color: var(--bone);
+  font-family: var(--f-mono);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.15s;
+  min-width: 0;
+}
+
+.monoInput:focus {
+  border-color: var(--caramel);
+}
+
+.monoInput::placeholder {
+  color: var(--bone-dim);
+}
+
+.monoInput:disabled {
+  opacity: 0.4;
+}
+
+.monoSelect {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--charcoal);
+  border: 1px solid var(--rule-slate);
+  color: var(--bone);
+  font-family: var(--f-mono);
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  appearance: none;
+}
+
+.monoSelect:focus {
+  border-color: var(--caramel);
+}
+
+/* ── Feedback messages ────────────────────────────────────────── */
+.feedbackOk {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: #22c55e;
+  padding: 6px 0;
+}
+
+.feedbackErr {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: #f87171;
+  padding: 6px 0;
+}
+
+.metaLabel {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--bone-dim);
+  text-transform: uppercase;
+}

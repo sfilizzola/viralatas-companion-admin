@@ -1,0 +1,17 @@
+.shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  overflow-y: auto;
+  background: var(--ink);
+}
+
+.content {
+  padding: 28px;
+  max-width: 1200px;
+}
