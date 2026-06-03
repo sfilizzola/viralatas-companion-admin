@@ -1,0 +1,80 @@
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-dim);
+}
+
+/* ── Day segmented strip ─────────────────────────────────────────── */
+.dayStrip {
+  display: flex;
+}
+
+.dayBtn {
+  flex: 1;
+  padding: 8px 0;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  background: var(--charcoal);
+  border: 1px solid var(--rule-slate);
+  border-right: none;
+  color: var(--bone-soft);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  text-align: center;
+}
+
+.dayBtn:last-child {
+  border-right: 1px solid var(--rule-slate);
+}
+
+.dayBtn:hover:not(:disabled) {
+  background: var(--slate-deep);
+  color: var(--bone);
+}
+
+.dayBtnActive {
+  background: var(--caramel) !important;
+  color: var(--ink) !important;
+  border-color: var(--caramel) !important;
+}
+
+.dayBtnActive + .dayBtn {
+  border-left-color: var(--caramel);
+}
+
+.dayBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Time window row ─────────────────────────────────────────────── */
+.timeRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.timeField {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.timeSep {
+  font-family: var(--f-mono);
+  font-size: 13px;
+  color: var(--bone-dim);
+  padding-bottom: 10px;
+  flex-shrink: 0;
+  user-select: none;
+}

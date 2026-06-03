@@ -64,28 +64,18 @@ Implementation:
 - Input UX: the `band_id` is a UUID, not a human name. Consider: either a UUID text input (acceptable for godlike admin) or a future lookup against `bands` table. For V1, a UUID input with validation is sufficient.
 - RLS: godlike-only table — the logged-in session automatically satisfies the policy
 
-### 2.2 MetalPlaceTest (`A-04`) — real schema
+### 2.2 MetalPlaceConfig (`B-02`) — moved to Data Management
 
-Table: `public.metal_place_config` (single row, `id = 1`)
+> ✅ **Implemented.** See `docs/superpowers/specs/2026-06-04-metal-place-config-design.md`
 
-```
-festival_day       integer (1–4 or NULL)   ← real festival day
-start_time         time DEFAULT '18:00'
-end_time           time DEFAULT '06:00'
-label              text DEFAULT 'Metal Place'
-test_override_day  integer (1–4 or NULL)   ← THIS is the test knob (stub uses "test_mode" bool + radius — BOTH WRONG)
-updated_by         uuid
-updated_at         timestamptz
-```
+The original `MetalPlaceTest` stub (wrong schema, wrong section) has been replaced by `MetalPlaceConfig` in Data Management. It edits the real festival configuration (`festival_day`, `start_time`, `end_time`) — not a test override.
 
-The card needs to be **redesigned** — the stub's `test_mode` toggle and `radius` input do not match the real schema.
+File: `src/sections/DataManagement/MetalPlaceConfig.tsx`
 
-New control:
-- **Enable test override:** toggle — maps to `test_override_day IS NOT NULL`
-- **Override day selector:** when enabled, a 1–4 selector (or number input) that writes to `test_override_day`
-- Disable: set `test_override_day = NULL`
-- Show current `festival_day`, `start_time`, `end_time` as read-only context labels
-- On mount: fetch current row; subscribe to Realtime
+- On mount: fetch `festival_day`, `start_time`, `end_time` from `metal_place_config WHERE id = 1`
+- Realtime: subscribed to `UPDATE` events on `metal_place_config`; remote changes sync to UI without overwriting in-progress edits
+- Save: `UPDATE metal_place_config SET festival_day, start_time, end_time, updated_by, updated_at WHERE id = 1`
+- Day selector: segmented strip (—, Day 1–4); time fields: `<input type="time">` pair
 
 ### 2.3 Realtime Banner component
 - Design spec: full-width card (`grid-column: span 3`) above the Testing Tools grid when a subscription is active

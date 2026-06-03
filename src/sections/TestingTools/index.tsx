@@ -2,7 +2,6 @@ import styles from '../sections.module.css'
 import { TestQuack } from './TestQuack'
 import { TestPush } from './TestPush'
 import { LiveBandTest } from './LiveBandTest'
-import { MetalPlaceTest } from './MetalPlaceTest'
 import { FeatureFlags } from './FeatureFlags'
 
 export function TestingTools() {
@@ -18,7 +17,6 @@ export function TestingTools() {
         <TestQuack />
         <TestPush />
         <LiveBandTest />
-        <MetalPlaceTest />
         <FeatureFlags />
       </div>
     </div>
