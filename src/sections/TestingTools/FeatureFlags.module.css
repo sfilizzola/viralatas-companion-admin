@@ -1,0 +1,27 @@
+.flagRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.flagLabel {
+  flex: 1;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bone-soft);
+}
+
+.flagKey {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--bone-dim);
+}
+
+.divider {
+  height: 1px;
+  background: var(--rule);
+  margin: 2px 0;
+}
