@@ -250,46 +250,82 @@ await supabase.from('user_badge_history').insert({
 
 ---
 
-## Phase 7 — Manage Servants (`D-01`)
+## Phase 7 — Servants of Metal (`D-01`)
 
-**Goal:** Replace the empty placeholder with a working servant table.
+**Goal:** Replace the empty placeholder with a full user management view.
 
-**How test users work** (from `ref-ai-wiki/flows/authentication.md` + `supabase-schema.md`):
-- `public.users.is_test_user boolean DEFAULT false`
-- Set at registration via `raw_user_meta_data->>'is_test_user' = 'true'` → trigger `handle_new_user` reads it
-- Any user with `is_test_user = true` is a servant
+**Scope:** All registered users in `public.users` (not limited to test users). No user creation in V1.
 
-### 7.1 List servants
-- `SELECT id, email, display_name, created_at FROM public.users WHERE is_test_user = true ORDER BY created_at DESC`
-- RLS allows all authenticated users to SELECT all profiles (policy: `USING (true)`)
-- Render as a simple table: email, display name, created date, Delete button
-- Empty state: "No test users yet"
+**Full design spec:** `docs/superpowers/specs/2026-06-03-phase7-servants-of-metal-design.md`
 
-### 7.2 Create servant
-- Form: email + password inputs
-- `supabase.auth.signUp({ email, password, options: { data: { is_test_user: 'true', preferred_language: 'en' } } })`
-- The `handle_new_user` trigger picks up `is_test_user: 'true'` and sets the flag in `public.users`
-- On success: re-fetch list; show "Servant created: email"
-- Gotcha: `auth.signUp()` works with the anon key — no Edge Function needed for creation
+### 7.1 List all users
 
-### 7.3 Delete servant
-- Deleting a user requires removing from `auth.users` (Supabase Auth), which cascades to `public.users` via FK
-- **The anon key cannot delete auth users** — this requires `service_role` key
-- Solution: create an Edge Function `delete-test-user` that:
-  - Verifies the caller is the godlike user (JWT check)
-  - Verifies the target user has `is_test_user = true` (safety guard)
-  - Uses `supabaseAdmin.auth.admin.deleteUser(userId)` with service_role key
-- In the admin app: `supabase.functions.invoke('delete-test-user', { body: { userId } })`
-- Confirmation dialog before delete
-- On success: re-fetch list
+Fetch all users with their total badge count in a single query:
 
-### 7.4 Edge Function: `delete-test-user`
-- New function (does not exist in companion app)
-- Must be created in the Supabase project
-- Deno runtime, same as other Edge Functions
-- Needs `SUPABASE_SERVICE_ROLE_KEY` in Supabase secrets (already set for other admin functions)
+```typescript
+supabase
+  .from('users')
+  .select('id, email, display_name, avatar_url, role, is_friend, is_test_user, user_badge_history(count)')
+  .order('created_at', { ascending: false })
+```
 
-**Deliverable:** Servants list, create (via `signUp`), and delete (via new Edge Function) all work.
+Each user row displays:
+- Avatar (`avatar_url`) or initials fallback (first letter of first + last word of `display_name`, or first 2 chars of email)
+- `display_name` (or email if null)
+- `email`
+- Role badge: `vira-lata` (maps to `'normal'`), `manager`, or `godlike`
+- Total badge count (from `user_badge_history`)
+- Friend flag (`is_friend` boolean, shown as yes/no indicator)
+
+RLS allows all authenticated users to SELECT all profiles (`USING (true)`).
+
+### 7.2 Inline editable fields
+
+Two fields can be changed directly in the user row, with optimistic UI (immediate update, revert on error):
+
+**Toggle `is_friend`:**
+```typescript
+supabase.from('users').update({ is_friend: !currentValue }).eq('id', userId)
+```
+- `null` is treated as `false` for display; first toggle sets it to `true`
+- Requires godlike UPDATE RLS policy on `public.users` — verify at implementation time; add migration if missing (see spec for SQL)
+
+**Toggle manager role (`normal` ↔ `manager`):**
+```typescript
+const newRole = servant.role === 'manager' ? 'normal' : 'manager'
+supabase.from('users').update({ role: newRole }).eq('id', userId).neq('role', 'godlike')
+```
+- Godlike rows: role toggle is **hidden** in the UI; `.neq('role', 'godlike')` is an additional server-side guard
+
+### 7.3 Delete user
+
+- Delete button hidden for the godlike user's own row
+- Inline two-step confirmation in the row: click trash → row shows "Are you sure? [Cancel] [Delete]"
+- Calls `delete-user` Edge Function (see 7.4)
+- On success: remove row from local state optimistically
+
+### 7.4 Edge Function: `delete-user`
+
+New Deno Edge Function (does not yet exist in the Supabase project):
+
+- Verifies caller JWT belongs to a godlike user
+- Verifies target user is not godlike (returns 400 if so)
+- Calls `supabaseAdmin.auth.admin.deleteUser(userId)` with `service_role` key — cascades to `public.users` via FK
+- Error responses: 403 (caller not godlike), 400 (target is godlike / not found), 500 (admin API error)
+- Needs `SUPABASE_SERVICE_ROLE_KEY` and `SUPABASE_URL` in Supabase project secrets
+
+### 7.5 Component structure
+
+```
+src/sections/UserManagement/
+  ManageServants.tsx    ← orchestrator (fullWidth FunctionCard)
+  UserList.tsx          ← maps servants → UserRow; loading/empty/error states
+  UserRow.tsx           ← avatar, info, role toggle, friend toggle, delete
+  useServants.ts        ← fetch + optimistic mutations hook
+  servantTypes.ts       ← Servant interface
+```
+
+**Deliverable:** All-users list with avatar, name, email, role, badge count, friend status; inline role and friend toggles; delete via new `delete-user` Edge Function.
 
 ---
 
