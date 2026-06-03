@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { AuthGate } from './components/AuthGate/AuthGate'
 import { Sidebar } from './components/Sidebar/Sidebar'
 import { useAuth } from './hooks/useAuth'
+import { useSupabaseStatus } from './hooks/useSupabaseStatus'
 import { TestingTools } from './sections/TestingTools'
 import { DataManagement } from './sections/DataManagement'
 import { BadgeTesting } from './sections/BadgeTesting'
@@ -12,6 +13,7 @@ export type Section = 'testing' | 'data' | 'badges' | 'users'
 
 function AdminShell() {
   const auth = useAuth()
+  const supabaseStatus = useSupabaseStatus()
   const [activeSection, setActiveSection] = useState<Section>('testing')
 
   if (auth.status !== 'authorized') return null
@@ -23,7 +25,7 @@ function AdminShell() {
         activeSection={activeSection}
         onNavigate={setActiveSection}
         email={email}
-        connected={true}
+        connected={supabaseStatus === 'connected'}
       />
       <main className={styles.main}>
         <div className={styles.content}>

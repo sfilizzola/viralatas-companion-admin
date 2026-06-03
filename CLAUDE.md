@@ -4,7 +4,35 @@
 
 A dedicated admin web application for the godlike user (`sfilizzola@gmail.com`) to configure festival settings, trigger tests, and manage data for the **viralatas** main app. It runs as a separate repo, separate domain, and independent CI/CD pipeline — fully isolated from the user-facing app while sharing the same Supabase backend.
 
-Design doc: [`ADMIN_TOOL.md`](./ADMIN_TOOL.md)
+Design doc: [`ADMIN_TOOL.md`](./ADMIN_TOOL.md)  
+Implementation phases: [`PHASES.md`](./PHASES.md)
+
+---
+
+## Companion App Reference Wiki
+
+`ref-ai-wiki/` contains the full AI-readable wiki exported from the companion app (`viralatas-companion`). **Read this before touching any Supabase integration.** It is the single source of truth for:
+
+| File | What to read it for |
+|---|---|
+| `supabase-schema.md` | Exact table DDL, column names, RLS policies, realtime config |
+| `flows/duck.md` | TestQuack + TestPush mechanics, `duck_quacks` table, `send-test-push` / `send-duck-push` Edge Functions |
+| `badges.md` | `BadgeConfig` structure, all badge slugs, `user_badge_history` columns |
+| `flows/authentication.md` | How test users are created (`is_test_user` meta, trigger), session, RLS |
+| `index.md` | Quick navigation to all other wiki pages |
+
+**Key schema facts for admin functions** (extracted from the wiki):
+
+| Admin card | Table | Key columns / notes |
+|---|---|---|
+| Live Band Test | `live_band_test_config` | `enabled boolean`, `band_id uuid` (FK → `bands.id`) — NOT a text field |
+| Metal Place Test | `metal_place_config` | `test_override_day integer` (1–4 or NULL) — no `test_mode` bool, no radius |
+| Feature Flags | `app_settings` | `duck_enabled boolean`, also `registration_enabled`, `playlist_testing` |
+| Cache Reset | `app_config` | key=`'cache_version'`, value=ISO timestamp — no RPC, direct `UPDATE` |
+| Test Badges | `user_badge_history` | `user_id, festival_year, slug, image_path, label_key, consolidated_at` — `image_path` + `label_key` must be provided |
+| Manage Servants | `public.users` | `is_test_user boolean` — test users listed by this flag; delete requires an Edge Function (service_role key) |
+| Test Quack | local event | fires `viralatas:duck-quack` window event — **no DB write**, no push; only tests DuckToast locally |
+| Test Push | Edge Function | `supabase.functions.invoke('send-test-push')` — tests full VAPID push stack |
 
 ---
 
@@ -85,15 +113,17 @@ Organized into 4 collapsible sections in the UI:
 
 | Table | Reads | Writes | Realtime |
 |---|---|---|---|
-| `metal_place_config` | Test mode status, zone config | Toggle test mode, update zone config | ✅ subscribed |
-| `live_band_test_config` | Active band ID, test mode status | Set band ID, toggle test mode | ✅ subscribed |
-| `user_badge_history` | Badges on godlike user | Add test badges | — |
-| `users` | List test users | Create / delete test users | — |
+| `metal_place_config` | `test_override_day` (1–4 or NULL) | Set `test_override_day` | ✅ subscribed |
+| `live_band_test_config` | `enabled`, `band_id` (uuid) | Set `enabled`, set `band_id` | ✅ subscribed |
+| `app_settings` | `duck_enabled`, `registration_enabled`, `playlist_testing` | Toggle flags | — |
+| `app_config` | `cache_version` (key/value) | `UPDATE value = now()::text WHERE key = 'cache_version'` | — |
+| `user_badge_history` | Badges on godlike user | Insert with `slug`, `image_path`, `label_key`, `festival_year` | — |
+| `public.users` | `is_test_user = true` rows | — (create via `auth.signUp`) | — |
 
-Edge Functions (existing or to be created):
-- `send-test-push` — Sends test web push notification
-- Time Travel function — TBD (may need to be created)
-- Cache reset function — TBD (scope: IndexedDB only vs. distributed caches)
+Edge Functions (existing in companion app):
+- `send-test-push` — Tests full VAPID web push stack (TestPush card)
+- `consolidate-year-badges` — Bulk upserts year-badges (not used by admin app directly)
+- `send-duck-push` — Triggered by DB webhook on `duck_quacks` INSERT (TestQuack reference)
 
 ---
 
