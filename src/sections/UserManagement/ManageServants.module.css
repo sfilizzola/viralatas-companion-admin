@@ -1,0 +1,407 @@
+/* ── Strip list ─────────────────────────────────────────────────── */
+.stripList {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+}
+
+/* ── Column header bar ──────────────────────────────────────────── */
+.colBar {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--rule);
+}
+
+.colH {
+  font-family: var(--f-mono);
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--bone-dim);
+  padding: 8px 0;
+}
+
+.colHAvatar  { width: 52px; text-align: center; flex-shrink: 0; border-right: 1px solid var(--rule); }
+.colHIdentity { flex: 1; padding-left: 14px; border-right: 1px solid var(--rule); }
+.colHRole    { width: 100px; text-align: center; border-right: 1px solid var(--rule); flex-shrink: 0; }
+.colHBadges  { width: 72px; text-align: center; border-right: 1px solid var(--rule); flex-shrink: 0; }
+.colHMgr     { width: 88px; text-align: center; border-right: 1px solid var(--rule); flex-shrink: 0; }
+.colHFriend  { width: 88px; text-align: center; border-right: 1px solid var(--rule); flex-shrink: 0; }
+.colHBlocked { width: 88px; text-align: center; border-right: 1px solid var(--rule); flex-shrink: 0; }
+.colHDel     { width: 52px; text-align: center; flex-shrink: 0; }
+
+/* ── Each row ────────────────────────────────────────────────────── */
+.strip {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--rule);
+  min-height: 52px;
+  transition: background 0.1s;
+  position: relative;
+}
+
+.strip:hover {
+  background: rgba(242, 235, 222, 0.02);
+}
+
+.strip:last-child {
+  border-bottom: none;
+}
+
+.stripConfirm {
+  background: rgba(192, 30, 30, 0.05);
+}
+
+/* ── Avatar segment ─────────────────────────────────────────────── */
+.segAvatar {
+  width: 52px;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-right: 1px solid var(--rule);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  overflow: hidden;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.avGodlike  { background: rgba(217, 123, 44, 0.12); color: var(--caramel); border: 1px solid rgba(217, 123, 44, 0.35); }
+.avManager  { background: rgba(96, 165, 250, 0.10);  color: #60a5fa;       border: 1px solid rgba(96, 165, 250, 0.3); }
+.avNormal   { background: rgba(63, 77, 96, 0.4);     color: var(--bone-soft); border: 1px solid rgba(63, 77, 96, 0.65); }
+.avTest     { background: transparent;               color: rgba(200, 191, 175, 0.4); border: 1px dashed rgba(63, 77, 96, 0.4); }
+
+/* ── Identity segment ───────────────────────────────────────────── */
+.segIdentity {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 14px;
+  min-width: 0;
+  border-right: 1px solid var(--rule);
+}
+
+.idName {
+  font-family: var(--f-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bone);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.idEmail {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: var(--bone-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.testDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--caramel);
+  opacity: 0.65;
+  flex-shrink: 0;
+}
+
+/* ── Role segment ───────────────────────────────────────────────── */
+.segRole {
+  width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--rule);
+  flex-shrink: 0;
+}
+
+.roleTag {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid;
+}
+
+.rtGodlike { color: var(--caramel); border-color: rgba(217, 123, 44, 0.45); }
+.rtManager { color: #60a5fa; border-color: rgba(96, 165, 250, 0.35); }
+.rtNormal  { color: var(--bone-soft); border-color: rgba(200, 191, 175, 0.2); }
+
+/* ── Badges segment ─────────────────────────────────────────────── */
+.segBadges {
+  width: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--rule);
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.badgeNum {
+  font-family: var(--f-mono);
+  font-size: 14px;
+  color: var(--bone);
+  line-height: 1;
+}
+
+.badgeNumZero {
+  color: var(--bone-dim);
+}
+
+.badgeLbl {
+  font-family: var(--f-mono);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bone-dim);
+}
+
+/* ── Toggle segments ────────────────────────────────────────────── */
+.segToggle {
+  width: 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  border-right: 1px solid var(--rule);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.segToggleInner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 10px 8px;
+  transition: background 0.1s;
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+}
+
+.segToggleInner:focus-visible {
+  outline: 1px solid var(--caramel);
+  outline-offset: -2px;
+}
+
+.toggleOn  { background: rgba(217, 123, 44, 0.08); }
+.toggleOff { background: transparent; }
+
+.toggleOn:hover  { background: rgba(217, 123, 44, 0.16); }
+.toggleOff:hover { background: rgba(242, 235, 222, 0.04); }
+
+.toggleDisabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.toggleDisabled:hover {
+  background: transparent;
+}
+
+.tglBar {
+  height: 2px;
+  width: 100%;
+}
+
+.tglBarOn  { background: var(--caramel); opacity: 0.6; }
+.tglBarOff { background: transparent; }
+
+.tglLbl {
+  font-family: var(--f-mono);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tglLblOn  { color: var(--caramel); }
+.tglLblOff { color: var(--bone-dim); }
+
+.tglVal {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.tglValOn  { color: var(--caramel); }
+.tglValOff { color: rgba(242, 235, 222, 0.3); }
+
+/* ── Blocked (danger) toggle variant ───────────────────────────── */
+.toggleBlocked { background: rgba(192, 30, 30, 0.08); }
+.toggleBlocked:hover { background: rgba(192, 30, 30, 0.16); }
+
+.tglBarBlocked { background: var(--blood); opacity: 0.7; }
+
+.tglLblBlocked { color: var(--blood); }
+.tglValBlocked { color: var(--blood); }
+
+/* ── Delete segment ─────────────────────────────────────────────── */
+.segDel {
+  width: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.btnDel {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--bone-dim);
+  cursor: pointer;
+  font-size: 13px;
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.btnDel:hover {
+  border-color: var(--blood);
+  color: var(--blood);
+}
+
+.btnDelHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Inline confirm overlay ─────────────────────────────────────── */
+.segConfirm {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+.confirmWho {
+  font-family: var(--f-body);
+  font-size: 13px;
+  color: #f87171;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.confirmMsg {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: rgba(248, 113, 113, 0.75);
+  letter-spacing: 0.03em;
+}
+
+.confirmSpacer {
+  flex: 1;
+}
+
+.confirmCancel {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid rgba(242, 235, 222, 0.2);
+  color: var(--bone-soft);
+  transition: border-color 0.1s, color 0.1s;
+  white-space: nowrap;
+}
+
+.confirmCancel:hover {
+  border-color: var(--bone-soft);
+  color: var(--bone);
+}
+
+.confirmDelete {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--blood);
+  color: var(--blood);
+  transition: background 0.1s, color 0.1s;
+  white-space: nowrap;
+}
+
+.confirmDelete:hover {
+  background: var(--blood);
+  color: var(--bone);
+}
+
+/* ── Loading / empty / error states ────────────────────────────── */
+.stateRow {
+  padding: 24px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stateMsg {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--bone-dim);
+  text-transform: uppercase;
+}
+
+.stateMsgError {
+  color: #f87171;
+}
+
+.spinnerDot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--bone-dim);
+  border-radius: 50%;
+  margin-right: 8px;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 1; }
+}
