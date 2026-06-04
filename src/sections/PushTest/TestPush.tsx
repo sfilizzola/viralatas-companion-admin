@@ -25,21 +25,42 @@ export function TestPush() {
   const [rowStates, setRowStates] = useState<Map<string, RowState>>(new Map())
 
   useEffect(() => {
-    supabase
-      .from('users')
-      .select('id, display_name, email, push_subscriptions!inner(user_id)')
-      .eq('is_test_user', false)
-      .then(({ data, error }) => {
-        if (error) {
-          setFetchErr(error.message)
-        } else if (data) {
-          setUsers(
-            (data as Array<{ id: string; display_name: string | null; email: string }>)
-              .map(u => ({ id: u.id, display_name: u.display_name, email: u.email }))
-          )
-        }
+    async function load() {
+      const { data: subs, error: subErr } = await supabase
+        .from('push_subscriptions')
+        .select('user_id')
+
+      if (subErr) {
+        setFetchErr(subErr.message)
         setFetching(false)
-      })
+        return
+      }
+
+      const userIds = [...new Set((subs ?? []).map(s => s.user_id as string))]
+
+      if (userIds.length === 0) {
+        setFetching(false)
+        return
+      }
+
+      const { data: userData, error: userErr } = await supabase
+        .from('users')
+        .select('id, display_name, email')
+        .in('id', userIds)
+        .eq('is_test_user', false)
+
+      if (userErr) {
+        setFetchErr(userErr.message)
+      } else if (userData) {
+        setUsers(
+          (userData as Array<{ id: string; display_name: string | null; email: string }>)
+            .map(u => ({ id: u.id, display_name: u.display_name, email: u.email }))
+        )
+      }
+      setFetching(false)
+    }
+
+    load()
   }, [])
 
   const setRow = useCallback((userId: string, state: RowState) => {
