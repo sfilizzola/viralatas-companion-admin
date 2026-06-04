@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { FunctionCard } from '../../components/FunctionCard/FunctionCard'
 import { useFeedback } from '../../hooks/useFeedback'
+import { bumpCacheVersion } from '../../lib/db/appConfig'
 import styles from '../sections.module.css'
 
 export function CacheReset() {
@@ -11,12 +12,16 @@ export function CacheReset() {
   async function handleReset() {
     if (!confirm('Bump the cache version? All main app clients will re-fetch.')) return
     setLoading(true)
-    // TODO: increment cache_version counter in Supabase
-    // e.g. supabase.rpc('increment_cache_version')
-    await new Promise(r => setTimeout(r, 500)) // stub delay
+    const { error } = await bumpCacheVersion()
+    setLoading(false)
+
+    if (error) {
+      show('error', `Failed — ${error.message}`)
+      return
+    }
+
     const ts = new Date().toISOString()
     setLastReset(ts)
-    setLoading(false)
     show('success', 'Cache version bumped — all clients will invalidate.')
   }
 

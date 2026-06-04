@@ -1,11 +1,8 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
+import type { BandOption } from '../../lib/types'
 import styles from './BandCombobox.module.css'
 
-export interface BandOption {
-  id: string
-  name: string
-  pickCount: number
-}
+export type { BandOption }
 
 interface Props {
   readonly bands: BandOption[]

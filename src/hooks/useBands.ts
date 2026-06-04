@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import type { BandOption } from '../components/BandCombobox/BandCombobox'
+import type { BandOption } from '../lib/types'
 
 export function useBands(): { bands: BandOption[]; loading: boolean } {
   const [bands, setBands] = useState<BandOption[]>([])

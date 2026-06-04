@@ -1,7 +1,7 @@
 import { useState } from 'react'
+import { AuthProvider, useAuthContext } from './contexts/AuthContext'
 import { AuthGate } from './components/AuthGate/AuthGate'
 import { Sidebar } from './components/Sidebar/Sidebar'
-import { useAuth } from './hooks/useAuth'
 import { useSupabaseStatus } from './hooks/useSupabaseStatus'
 import { TestingTools } from './sections/TestingTools'
 import { PushTest } from './sections/PushTest'
@@ -13,20 +13,20 @@ import styles from './App.module.css'
 export type Section = 'testing' | 'push' | 'data' | 'badges' | 'users'
 
 function AdminShell() {
-  const auth = useAuth()
+  const { auth, signOut } = useAuthContext()
   const supabaseStatus = useSupabaseStatus()
   const [activeSection, setActiveSection] = useState<Section>('testing')
 
   if (auth.status !== 'authorized') return null
-  const email = auth.email
 
   return (
     <div className={styles.shell}>
       <Sidebar
         activeSection={activeSection}
         onNavigate={setActiveSection}
-        email={email}
+        email={auth.email}
         connected={supabaseStatus === 'connected'}
+        onSignOut={signOut}
       />
       <main className={styles.main}>
         <div className={styles.content}>
@@ -43,8 +43,10 @@ function AdminShell() {
 
 export default function App() {
   return (
-    <AuthGate>
-      <AdminShell />
-    </AuthGate>
+    <AuthProvider>
+      <AuthGate>
+        <AdminShell />
+      </AuthGate>
+    </AuthProvider>
   )
 }

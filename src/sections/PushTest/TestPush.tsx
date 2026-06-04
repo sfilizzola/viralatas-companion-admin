@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { FunctionCard } from '../../components/FunctionCard/FunctionCard'
 import { supabase } from '../../lib/supabase'
+import { useItemStates } from '../../hooks/useItemStates'
 import styles from './PushTest.module.css'
 
 interface PushUser {
@@ -19,10 +20,10 @@ type RowState =
 const ROW_CLEAR_MS = 5_000
 
 export function TestPush() {
-  const [users, setUsers]     = useState<PushUser[]>([])
-  const [fetching, setFetching] = useState(true)
-  const [fetchErr, setFetchErr] = useState<string | null>(null)
-  const [rowStates, setRowStates] = useState<Map<string, RowState>>(new Map())
+  const [users, setUsers]         = useState<PushUser[]>([])
+  const [fetching, setFetching]   = useState(true)
+  const [fetchErr, setFetchErr]   = useState<string | null>(null)
+  const { states: rowStates, set: setRow, remove: removeRow } = useItemStates<string, RowState>()
 
   useEffect(() => {
     async function load() {
@@ -63,13 +64,8 @@ export function TestPush() {
     load()
   }, [])
 
-  const setRow = useCallback((userId: string, state: RowState) => {
-    setRowStates(prev => new Map(prev).set(userId, state))
-  }, [])
-
   async function handleSend(user: PushUser) {
-    const current = rowStates.get(user.id)
-    if (current?.type === 'loading') return
+    if (rowStates.get(user.id)?.type === 'loading') return
 
     setRow(user.id, { type: 'loading' })
 
@@ -88,13 +84,7 @@ export function TestPush() {
       setRow(user.id, { type: 'error', reason })
     }
 
-    setTimeout(() => {
-      setRowStates(prev => {
-        const next = new Map(prev)
-        next.delete(user.id)
-        return next
-      })
-    }, ROW_CLEAR_MS)
+    setTimeout(() => removeRow(user.id), ROW_CLEAR_MS)
   }
 
   function rowStatusLabel(state: RowState | undefined): { text: string; cls: string } {

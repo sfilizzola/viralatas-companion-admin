@@ -1,13 +1,12 @@
-import { supabase } from '../../lib/supabase'
 import type { Section } from '../../App'
 import styles from './Sidebar.module.css'
 
 const NAV_ITEMS: { id: Section; label: string; icon: string; count: number }[] = [
-  { id: 'testing',    label: 'Live Tests',       icon: '⚡', count: 2 },
-  { id: 'push',       label: 'Push Test',        icon: '◎', count: 2 },
-  { id: 'data',       label: 'Data Management',  icon: '⊞', count: 1 },
-  { id: 'badges',     label: 'Badge Consolidation', icon: '◈', count: 1 },
-  { id: 'users',      label: 'User Management',  icon: '⊙', count: 1 },
+  { id: 'testing',    label: 'Live Tests',          icon: '⚡', count: 2 },
+  { id: 'push',       label: 'Push Test',           icon: '◎', count: 2 },
+  { id: 'data',       label: 'Data Management',     icon: '⊞', count: 2 },
+  { id: 'badges',     label: 'Badge Testing',       icon: '◈', count: 2 },
+  { id: 'users',      label: 'User Management',     icon: '⊙', count: 1 },
 ]
 
 interface Props {
@@ -15,13 +14,10 @@ interface Props {
   onNavigate: (section: Section) => void
   email: string
   connected: boolean
+  onSignOut: () => void
 }
 
-export function Sidebar({ activeSection, onNavigate, email, connected }: Props) {
-  async function handleSignOut() {
-    await supabase.auth.signOut()
-  }
-
+export function Sidebar({ activeSection, onNavigate, email, connected, onSignOut }: Props) {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logo}>
@@ -62,7 +58,7 @@ export function Sidebar({ activeSection, onNavigate, email, connected }: Props) 
             <span className={styles.footerBadge}>Godlike</span>
           </div>
         </div>
-        <button className={styles.signOutBtn} onClick={handleSignOut}>
+        <button className={styles.signOutBtn} onClick={onSignOut}>
           Sign out
         </button>
       </div>

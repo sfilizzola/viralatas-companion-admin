@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { supabase } from '../../lib/supabase'
-import { useAuth } from '../../hooks/useAuth'
+import { useAuthContext } from '../../contexts/AuthContext'
 import styles from './AuthGate.module.css'
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
 }
 
 export function AuthGate({ children }: Props) {
-  const auth = useAuth()
+  const { auth } = useAuthContext()
 
   if (auth.status === 'loading') {
     return (

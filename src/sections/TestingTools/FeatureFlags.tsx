@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../../lib/supabase'
 import { FunctionCard } from '../../components/FunctionCard/FunctionCard'
 import type { CardStatus } from '../../components/FunctionCard/FunctionCard'
 import { Toggle } from '../../components/Toggle/Toggle'
 import { useFeedback } from '../../hooks/useFeedback'
+import { getAppSettings, updateAppSetting } from '../../lib/db/appSettings'
 import styles from '../sections.module.css'
 import local from './FeatureFlags.module.css'
 
@@ -15,13 +15,7 @@ export function FeatureFlags() {
   const [fetchFailed, setFetchFailed] = useState(false)
 
   useEffect(() => {
-    async function fetchFlags() {
-      const { data, error } = await supabase
-        .from('app_settings')
-        .select('duck_enabled, registration_enabled')
-        .limit(1)
-        .single()
-
+    getAppSettings().then(({ data, error }) => {
       if (error || !data) {
         setFetchFailed(true)
         // Default-on: a fetch failure must never silently disable features
@@ -32,16 +26,13 @@ export function FeatureFlags() {
         setRegistrationEnabled(data.registration_enabled)
       }
       setLoading(false)
-    }
-    fetchFlags()
+    })
   }, [])
 
   async function handleDuckToggle(val: boolean) {
     const prev = duckEnabled
     setDuckEnabled(val)
-    const { error } = await supabase
-      .from('app_settings')
-      .update({ duck_enabled: val, updated_at: new Date().toISOString() })
+    const { error } = await updateAppSetting('duck_enabled', val)
     if (error) {
       setDuckEnabled(prev)
       show('error', 'Failed to update duck flag — check connection')
@@ -53,9 +44,7 @@ export function FeatureFlags() {
   async function handleRegistrationToggle(val: boolean) {
     const prev = registrationEnabled
     setRegistrationEnabled(val)
-    const { error } = await supabase
-      .from('app_settings')
-      .update({ registration_enabled: val, updated_at: new Date().toISOString() })
+    const { error } = await updateAppSetting('registration_enabled', val)
     if (error) {
       setRegistrationEnabled(prev)
       show('error', 'Failed to update registration flag — check connection')

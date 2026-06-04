@@ -1,86 +1,35 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { FunctionCard } from '../../components/FunctionCard/FunctionCard'
 import { Toggle } from '../../components/Toggle/Toggle'
 import { BandCombobox } from '../../components/BandCombobox/BandCombobox'
 import { useFeedback } from '../../hooks/useFeedback'
 import { useBands } from '../../hooks/useBands'
-import { supabase } from '../../lib/supabase'
+import { useLiveBandConfig } from '../../hooks/useLiveBandConfig'
+import { setLiveBandConfig } from '../../lib/db/liveBandConfig'
 import styles from '../sections.module.css'
-
-interface LiveBandConfig {
-  enabled: boolean
-  bandId: string | null
-}
 
 export function LiveBandTest() {
   const { feedback, show } = useFeedback()
   const { bands } = useBands()
+  const { config, loading } = useLiveBandConfig()
 
-  const [config, setConfig]           = useState<LiveBandConfig>({ enabled: false, bandId: null })
-  const [selectedId, setSelectedId]   = useState<string | null>(null)
-  const [loading, setLoading]         = useState(true)
-  const [saving, setSaving]           = useState(false)
-
-  const configRef = useRef<LiveBandConfig>({ enabled: false, bandId: null })
-  useEffect(() => { configRef.current = config }, [config])
-
-  useEffect(() => {
-
-    supabase
-      .from('live_band_test_config')
-      .select('enabled, band_id')
-      .eq('id', 1)
-      .single()
-      .then(({ data, error }) => {
-        if (!error && data) {
-          const cfg: LiveBandConfig = { enabled: data.enabled, bandId: data.band_id ?? null }
-          setConfig(cfg)
-          setSelectedId(cfg.bandId)
-        }
-        setLoading(false)
-      })
-
-    const channel = supabase
-      .channel('live_band_test_config_watch')
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'live_band_test_config', filter: 'id=eq.1' },
-        (payload) => {
-          const row = payload.new as { enabled: boolean; band_id: string | null }
-          setConfig({ enabled: row.enabled, bandId: row.band_id ?? null })
-        }
-      )
-      .subscribe()
-
-    return () => { supabase.removeChannel(channel) }
-  }, [])
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
 
   async function handleToggle(val: boolean) {
     if (saving) return
     setSaving(true)
-
-    const { data: { session } } = await supabase.auth.getSession()
     // Turning ON always clears the previous band — forces an explicit 2-step flow
     const patch = val
-      ? { enabled: true, band_id: null, updated_by: session?.user.id, updated_at: new Date().toISOString() }
-      : { enabled: false, updated_by: session?.user.id, updated_at: new Date().toISOString() }
-
-    const { error } = await supabase
-      .from('live_band_test_config')
-      .update(patch)
-      .eq('id', 1)
-
+      ? { enabled: true, bandId: null as null }
+      : { enabled: false }
+    const { error } = await setLiveBandConfig(patch)
     setSaving(false)
 
     if (error) {
       show('error', `Failed — ${error.message}`)
     } else {
-      if (val) {
-        setConfig({ enabled: true, bandId: null })
-        setSelectedId(null)
-      } else {
-        setConfig(prev => ({ ...prev, enabled: false }))
-      }
+      if (val) setSelectedId(null)
       show('success', val ? 'Test mode enabled — select a band.' : 'Test mode disabled.')
     }
   }
@@ -88,19 +37,12 @@ export function LiveBandTest() {
   async function handleClearBand() {
     if (saving) return
     setSaving(true)
-
-    const { data: { session } } = await supabase.auth.getSession()
-    const { error } = await supabase
-      .from('live_band_test_config')
-      .update({ band_id: null, updated_by: session?.user.id, updated_at: new Date().toISOString() })
-      .eq('id', 1)
-
+    const { error } = await setLiveBandConfig({ bandId: null })
     setSaving(false)
 
     if (error) {
       show('error', `Failed — ${error.message}`)
     } else {
-      setConfig(prev => ({ ...prev, bandId: null }))
       setSelectedId(null)
       show('success', 'Live band cleared.')
     }
@@ -109,20 +51,13 @@ export function LiveBandTest() {
   async function handleSetBand() {
     if (!selectedId || saving) return
     setSaving(true)
-
-    const { data: { session } } = await supabase.auth.getSession()
-    const { error } = await supabase
-      .from('live_band_test_config')
-      .update({ band_id: selectedId, updated_by: session?.user.id, updated_at: new Date().toISOString() })
-      .eq('id', 1)
-
+    const { error } = await setLiveBandConfig({ bandId: selectedId })
     setSaving(false)
 
     if (error) {
       show('error', `Failed — ${error.message}`)
     } else {
       const band = bands.find(b => b.id === selectedId)
-      setConfig(prev => ({ ...prev, bandId: selectedId }))
       show('success', `Live band set to "${band?.name ?? selectedId}".`)
     }
   }
