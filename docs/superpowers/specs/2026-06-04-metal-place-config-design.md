@@ -73,8 +73,8 @@ Only `festival_day`, `start_time`, and `end_time` are read or written by this ca
 ```typescript
 interface MetalPlaceData {
   festival_day: number | null   // 1–4 or null
-  start_time: string            // "HH:MM"
-  end_time: string              // "HH:MM"
+  start_time: string            // "HH:MM" — Supabase returns "HH:MM:SS"; truncate to "HH:MM" when populating the input
+  end_time: string              // "HH:MM" — same truncation applies
 }
 
 saved: MetalPlaceData     // last DB values (from fetch or successful save)
