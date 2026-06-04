@@ -1,5 +1,5 @@
 import styles from '../sections.module.css'
-import { TestBadges } from './TestBadges'
+import { ConsolidateBadges } from './ConsolidateBadges'
 
 export function BadgeTesting() {
   return (
@@ -7,11 +7,11 @@ export function BadgeTesting() {
       <div className={styles.sectionHeader}>
         <h1 className={styles.sectionTitle}>Badge Consolidation</h1>
         <p className={styles.sectionDesc}>
-          Add test badges to verify badge rendering and unlock conditions.
+          Snapshot year-badges for all non-test users into the permanent archive.
         </p>
       </div>
       <div className={styles.cardGrid}>
-        <TestBadges />
+        <ConsolidateBadges />
       </div>
     </div>
   )
