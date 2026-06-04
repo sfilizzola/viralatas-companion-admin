@@ -13,7 +13,7 @@ export function ManageServants() {
 
   return (
     <FunctionCard
-      id="D-01"
+      id="E-01"
       title="Servants of Metal"
       description="Registered users. Manage roles, friend status, and remove non-godlike accounts."
       status={status}

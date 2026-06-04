@@ -22,7 +22,7 @@ export function CacheReset() {
 
   return (
     <FunctionCard
-      id="B-01"
+      id="C-01"
       title="Cache Reset"
       description="Increment the Supabase cache version counter. All main app clients detect the bump and re-fetch fresh data."
       status={loading ? 'loading' : 'ready'}

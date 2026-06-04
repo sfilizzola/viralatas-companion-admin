@@ -4,12 +4,13 @@ import { Sidebar } from './components/Sidebar/Sidebar'
 import { useAuth } from './hooks/useAuth'
 import { useSupabaseStatus } from './hooks/useSupabaseStatus'
 import { TestingTools } from './sections/TestingTools'
+import { PushTest } from './sections/PushTest'
 import { DataManagement } from './sections/DataManagement'
 import { BadgeTesting } from './sections/BadgeTesting'
 import { UserManagement } from './sections/UserManagement'
 import styles from './App.module.css'
 
-export type Section = 'testing' | 'data' | 'badges' | 'users'
+export type Section = 'testing' | 'push' | 'data' | 'badges' | 'users'
 
 function AdminShell() {
   const auth = useAuth()
@@ -30,6 +31,7 @@ function AdminShell() {
       <main className={styles.main}>
         <div className={styles.content}>
           {activeSection === 'testing' && <TestingTools />}
+          {activeSection === 'push'    && <PushTest />}
           {activeSection === 'data'    && <DataManagement />}
           {activeSection === 'badges'  && <BadgeTesting />}
           {activeSection === 'users'   && <UserManagement />}

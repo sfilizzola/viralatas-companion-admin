@@ -12,7 +12,7 @@ export function TestPush() {
 
   return (
     <FunctionCard
-      id="A-02"
+      id="B-02"
       title="Test Push"
       description="Send a test web push notification via the send-test-push Edge Function."
       status={feedback?.type === 'error' ? 'error' : 'ready'}

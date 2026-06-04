@@ -109,7 +109,7 @@ export function MetalPlaceConfig() {
 
   return (
     <FunctionCard
-      id="B-02"
+      id="C-02"
       title="Metal Place Config"
       description="Configure the festival day and check-in time window."
       status={status}

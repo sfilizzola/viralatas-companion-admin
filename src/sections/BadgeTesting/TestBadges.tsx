@@ -27,7 +27,7 @@ export function TestBadges() {
 
   return (
     <FunctionCard
-      id="C-01"
+      id="D-01"
       title="Test Badges"
       description="Add test badges to the godlike user's account to verify badge rendering and conditions."
       status={loading ? 'loading' : 'ready'}

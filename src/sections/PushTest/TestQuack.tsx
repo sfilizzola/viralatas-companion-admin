@@ -20,7 +20,7 @@ export function TestQuack() {
 
   return (
     <FunctionCard
-      id="A-01"
+      id="B-01"
       title="Test Quack"
       description="Send a test duck notification to yourself. 15s cooldown between sends."
       status={feedback?.type === 'error' ? 'error' : cooldown ? 'loading' : 'ready'}

@@ -73,7 +73,7 @@ export function FeatureFlags() {
 
   return (
     <FunctionCard
-      id="A-05"
+      id="A-02"
       title="Feature Flags"
       description="Toggle features globally. Changes propagate to all users on their next app load."
       status={cardStatus()}

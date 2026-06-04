@@ -151,7 +151,7 @@ export function LiveBandTest() {
 
   return (
     <FunctionCard
-      id="A-03"
+      id="A-01"
       title="Live Band Test"
       description="Configure which band is 'live now' for testing presence and alerts."
       status={cardStatus}

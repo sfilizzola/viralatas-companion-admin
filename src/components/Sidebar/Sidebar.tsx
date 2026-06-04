@@ -3,10 +3,11 @@ import type { Section } from '../../App'
 import styles from './Sidebar.module.css'
 
 const NAV_ITEMS: { id: Section; label: string; icon: string; count: number }[] = [
-  { id: 'testing',    label: 'Testing Tools',   icon: '⚡', count: 5 },
-  { id: 'data',       label: 'Data Management', icon: '⊞', count: 1 },
-  { id: 'badges',     label: 'Badge Testing',   icon: '◈', count: 1 },
-  { id: 'users',      label: 'User Management', icon: '⊙', count: 1 },
+  { id: 'testing',    label: 'Live Tests',       icon: '⚡', count: 2 },
+  { id: 'push',       label: 'Push Test',        icon: '◎', count: 2 },
+  { id: 'data',       label: 'Data Management',  icon: '⊞', count: 1 },
+  { id: 'badges',     label: 'Badge Consolidation', icon: '◈', count: 1 },
+  { id: 'users',      label: 'User Management',  icon: '⊙', count: 1 },
 ]
 
 interface Props {
