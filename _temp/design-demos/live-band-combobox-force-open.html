@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Live Band Test · Combobox Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  :root {
+    --ink:        #0d0d10;
+    --ink-soft:   #1a1a1f;
+    --charcoal:   #2a2a30;
+    --slate:      #3f4d60;
+    --slate-deep: #2d3845;
+    --slate-mid:  #364455;
+    --bone:       #f2ebde;
+    --bone-soft:  #c8bfaf;
+    --bone-dim:   rgba(242, 235, 222, 0.45);
+    --caramel:    #d97b2c;
+    --caramel-hot:#f3953f;
+    --blood:      #c01e1e;
+    --rule:       rgba(242, 235, 222, 0.10);
+    --rule-slate: rgba(63, 77, 96, 0.6);
+    --f-body: "Space Grotesk", -apple-system, sans-serif;
+    --f-mono: "JetBrains Mono", ui-monospace, monospace;
+    --f-pop:  "Bungee", sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: var(--f-body); background: var(--ink); color: var(--bone); -webkit-font-smoothing: antialiased; }
+  #root { min-height: 100%; display: flex; align-items: flex-start; justify-content: center; padding: 48px 24px; gap: 32px; flex-wrap: wrap; }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; font-family: var(--f-mono); font-size: 11px;
+    font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--caramel); background: transparent; border: 1px solid var(--caramel);
+    transition: background 0.15s, color 0.15s; cursor: pointer;
+  }
+  .btn-primary:hover { background: var(--caramel); color: var(--ink); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-primary:disabled:hover { background: transparent; color: var(--caramel); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+// ── Mock data — realistic Wacken-style bands sorted by pick count ──
+const MOCK_BANDS = [
+  { id: 'uuid-001', name: 'Metallica',         pickCount: 187 },
+  { id: 'uuid-002', name: 'Slipknot',          pickCount: 162 },
+  { id: 'uuid-003', name: 'Powerwolf',         pickCount: 148 },
+  { id: 'uuid-004', name: 'Ghost',             pickCount: 141 },
+  { id: 'uuid-005', name: 'Rammstein',         pickCount: 138 },
+  { id: 'uuid-006', name: 'Nightwish',         pickCount: 124 },
+  { id: 'uuid-007', name: 'Dimmu Borgir',      pickCount: 117 },
+  { id: 'uuid-008', name: 'Arch Enemy',        pickCount: 109 },
+  { id: 'uuid-009', name: 'Behemoth',          pickCount: 103 },
+  { id: 'uuid-010', name: 'Sepultura',         pickCount:  98 },
+  { id: 'uuid-011', name: 'Children of Bodom', pickCount:  91 },
+  { id: 'uuid-012', name: 'Amon Amarth',       pickCount:  88 },
+  { id: 'uuid-013', name: 'Testament',         pickCount:  82 },
+  { id: 'uuid-014', name: 'Anthrax',           pickCount:  74 },
+  { id: 'uuid-015', name: 'Kreator',           pickCount:  69 },
+  { id: 'uuid-016', name: 'Sodom',             pickCount:  58 },
+  { id: 'uuid-017', name: 'Destruction',       pickCount:  51 },
+  { id: 'uuid-018', name: 'Obituary',          pickCount:  44 },
+  { id: 'uuid-019', name: 'Vader',             pickCount:  37 },
+  { id: 'uuid-020', name: 'Hypocrisy',         pickCount:  29 },
+];
+
+// ── BandCombobox ──────────────────────────────────────────────────
+function BandCombobox({ bands, value, onChange, disabled }) {
+  const [query, setQuery]       = React.useState('');
+  const [open, setOpen]         = React.useState(false);
+  const [highlighted, setHl]    = React.useState(0);
+  const inputRef   = React.useRef(null); React.useEffect(() => { setOpen(true); }, []);
+  const dropRef    = React.useRef(null);
+
+  // When value changes from outside, sync display text
+  const selectedBand = bands.find(b => b.id === value) || null;
+  const displayValue = open
+    ? query
+    : selectedBand
+      ? `${selectedBand.name} (${selectedBand.pickCount} picks)`
+      : '';
+
+  const filtered = React.useMemo(() => {
+    if (!query.trim()) return bands;
+    const q = query.toLowerCase();
+    return bands.filter(b => b.name.toLowerCase().includes(q));
+  }, [bands, query]);
+
+  function handleFocus() {
+    if (disabled) return;
+    setQuery('');
+    setOpen(true);
+    setHl(0);
+  }
+
+  function handleInput(e) {
+    setQuery(e.target.value);
+    setOpen(true);
+    setHl(0);
+  }
+
+  function selectBand(band) {
+    onChange(band.id);
+    setQuery('');
+    setOpen(false);
+    inputRef.current?.blur();
+  }
+
+  function handleKeyDown(e) {
+    if (!open) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHl(h => Math.min(h + 1, filtered.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHl(h => Math.max(h - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (filtered[highlighted]) selectBand(filtered[highlighted]);
+    } else if (e.key === 'Escape') {
+      setOpen(false);
+      setQuery('');
+      inputRef.current?.blur();
+    }
+  }
+
+  // Close on outside click
+  React.useEffect(() => {
+    function onDown(e) {
+      if (!dropRef.current?.contains(e.target) && e.target !== inputRef.current) {
+        setOpen(false);
+        setQuery('');
+      }
+    }
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, []);
+
+  return (
+    <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
+      <input
+        ref={inputRef}
+        type="text"
+        value={displayValue}
+        onFocus={handleFocus}
+        onChange={handleInput}
+        onKeyDown={handleKeyDown}
+        disabled={disabled}
+        placeholder="Search bands…"
+        style={{
+          width: '100%',
+          padding: '8px 12px',
+          background: 'var(--charcoal)',
+          border: `1px solid ${open ? 'var(--caramel)' : 'var(--rule-slate)'}`,
+          color: 'var(--bone)',
+          fontFamily: 'var(--f-mono)',
+          fontSize: '12px',
+          outline: 'none',
+          transition: 'border-color 0.15s',
+          opacity: disabled ? 0.4 : 1,
+          cursor: disabled ? 'not-allowed' : 'text',
+        }}
+      />
+      {open && filtered.length > 0 && (
+        <ul
+          ref={dropRef}
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 2px)',
+            left: 0,
+            right: 0,
+            maxHeight: '220px',
+            overflowY: 'auto',
+            background: 'var(--charcoal)',
+            border: '1px solid var(--caramel)',
+            borderTop: 'none',
+            listStyle: 'none',
+            zIndex: 50,
+            margin: 0,
+            padding: 0,
+          }}
+        >
+          {filtered.map((band, i) => {
+            const isHl  = i === highlighted;
+            const isSel = band.id === value;
+            return (
+              <li
+                key={band.id}
+                onMouseDown={(e) => { e.preventDefault(); selectBand(band); }}
+                onMouseEnter={() => setHl(i)}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '7px 12px',
+                  fontFamily: 'var(--f-mono)',
+                  fontSize: '11px',
+                  cursor: 'pointer',
+                  background: isHl
+                    ? 'rgba(217, 123, 44, 0.15)'
+                    : isSel
+                      ? 'rgba(217, 123, 44, 0.07)'
+                      : 'transparent',
+                  color: isHl ? 'var(--caramel)' : isSel ? 'var(--caramel-hot)' : 'var(--bone)',
+                  borderBottom: '1px solid rgba(63,77,96,0.3)',
+                  transition: 'background 0.1s',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {isSel && (
+                    <span style={{ color: 'var(--caramel)', fontSize: 9, letterSpacing: '0.1em' }}>◆</span>
+                  )}
+                  {band.name}
+                </span>
+                <span style={{
+                  color: isHl ? 'rgba(217,123,44,0.7)' : 'var(--bone-dim)',
+                  fontSize: '10px',
+                  letterSpacing: '0.04em',
+                  flexShrink: 0,
+                  marginLeft: 8,
+                }}>
+                  {band.pickCount} picks
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {open && filtered.length === 0 && (
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 2px)', left: 0, right: 0,
+          background: 'var(--charcoal)', border: '1px solid var(--rule-slate)',
+          borderTop: 'none', padding: '10px 12px',
+          fontFamily: 'var(--f-mono)', fontSize: '11px', color: 'var(--bone-dim)',
+          letterSpacing: '0.04em',
+        }}>
+          No bands match "{query}"
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Toggle ────────────────────────────────────────────────────────
+function Toggle({ checked, onChange, label }) {
+  return (
+    <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+      <button
+        role="switch"
+        aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        type="button"
+        style={{
+          position: 'relative', width: 36, height: 20,
+          background: checked ? 'rgba(217, 123, 44, 0.25)' : 'var(--charcoal)',
+          border: `1px solid ${checked ? 'var(--caramel)' : 'var(--rule-slate)'}`,
+          borderRadius: 0, cursor: 'pointer',
+          transition: 'background 0.2s, border-color 0.2s',
+          flexShrink: 0,
+        }}
+      >
+        <span style={{
+          position: 'absolute', top: 3, left: 3,
+          width: 12, height: 12,
+          background: checked ? 'var(--caramel)' : 'var(--bone-dim)',
+          transition: 'transform 0.2s, background 0.2s',
+          transform: checked ? 'translateX(16px)' : 'translateX(0)',
+        }}/>
+      </button>
+      {label && (
+        <span style={{
+          fontFamily: 'var(--f-mono)', fontSize: 11,
+          letterSpacing: '0.06em', color: 'var(--bone-soft)',
+          textTransform: 'uppercase',
+        }}>
+          {label}
+        </span>
+      )}
+    </label>
+  );
+}
+
+// ── FunctionCard ──────────────────────────────────────────────────
+const STATUS_CFG = {
+  ready:   { sym: '●', label: 'Ready',   color: '#22c55e' },
+  active:  { sym: '◆', label: 'Active',  color: 'var(--caramel)' },
+  off:     { sym: '○', label: 'Off',     color: 'var(--bone-dim)' },
+  loading: { sym: '◌', label: 'Loading', color: 'var(--bone-soft)' },
+  error:   { sym: '▲', label: 'Error',   color: '#f87171' },
+};
+
+function FunctionCard({ id, title, description, status = 'ready', children }) {
+  const s = STATUS_CFG[status];
+  return (
+    <div style={{
+      background: 'var(--ink-soft)',
+      border: '1px solid var(--rule)',
+      padding: 20, display: 'flex', flexDirection: 'column', gap: 8,
+      width: 380, transition: 'border-color 0.15s',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontFamily: 'var(--f-mono)', fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--bone-dim)' }}>
+          {id}
+        </span>
+        <span style={{ fontFamily: 'var(--f-mono)', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', color: s.color }}>
+          {s.sym} {s.label}
+        </span>
+      </div>
+      <h2 style={{ fontFamily: 'var(--f-pop)', fontSize: 14, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--bone)', fontWeight: 400 }}>
+        {title}
+      </h2>
+      <p style={{ fontFamily: 'var(--f-mono)', fontSize: 11, lineHeight: 1.6, color: 'var(--bone-soft)', letterSpacing: '0.02em' }}>
+        {description}
+      </p>
+      <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ── LiveBandTest card ─────────────────────────────────────────────
+function LiveBandTest() {
+  const [testMode, setTestMode] = React.useState(false);
+  const [selectedId, setSelectedId] = React.useState(null);
+  const [saved, setSaved] = React.useState(null); // last saved band id
+  const [feedback, setFeedback] = React.useState(null);
+
+  function showFeedback(type, msg) {
+    setFeedback({ type, msg });
+    setTimeout(() => setFeedback(null), 4000);
+  }
+
+  function handleToggle(val) {
+    setTestMode(val);
+    if (!val) {
+      showFeedback('ok', 'Test mode disabled.');
+    } else {
+      showFeedback('ok', 'Test mode enabled — select a band below.');
+    }
+  }
+
+  function handleSetBand() {
+    const band = MOCK_BANDS.find(b => b.id === selectedId);
+    if (!band) return;
+    setSaved(selectedId);
+    showFeedback('ok', `Live band set to "${band.name}".`);
+  }
+
+  const canSet = testMode && selectedId && selectedId !== saved;
+  const cardStatus = testMode && saved ? 'active' : testMode ? 'ready' : 'off';
+
+  const savedBand = MOCK_BANDS.find(b => b.id === saved);
+
+  return (
+    <FunctionCard
+      id="A-03"
+      title="Live Band Test"
+      description="Configure which band is 'live now' for testing presence and alerts."
+      status={cardStatus}
+    >
+      <Toggle checked={testMode} onChange={handleToggle} label="Test mode" />
+
+      <div style={{ display: 'flex', gap: 8, alignItems: 'stretch', opacity: testMode ? 1 : 0.4, pointerEvents: testMode ? 'auto' : 'none' }}>
+        <BandCombobox
+          bands={MOCK_BANDS}
+          value={selectedId}
+          onChange={setSelectedId}
+          disabled={!testMode}
+        />
+        <button
+          className="btn-primary"
+          onClick={handleSetBand}
+          disabled={!canSet}
+          style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
+        >
+          Set Band →
+        </button>
+      </div>
+
+      {testMode && savedBand && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          padding: '6px 10px',
+          background: 'rgba(217,123,44,0.08)',
+          border: '1px solid rgba(217,123,44,0.25)',
+          fontFamily: 'var(--f-mono)', fontSize: 10,
+          letterSpacing: '0.06em', color: 'var(--bone-soft)',
+        }}>
+          <span style={{ color: 'var(--caramel)' }}>◆</span>
+          <span>ACTIVE: <span style={{ color: 'var(--caramel)' }}>{savedBand.name}</span></span>
+        </div>
+      )}
+
+      {feedback && (
+        <p style={{
+          fontFamily: 'var(--f-mono)', fontSize: 11, letterSpacing: '0.04em',
+          color: feedback.type === 'ok' ? '#22c55e' : '#f87171', padding: '6px 0',
+        }}>
+          {feedback.msg}
+        </p>
+      )}
+    </FunctionCard>
+  );
+}
+
+// ── Annotation panel ───────────────────────────────────────────────
+function AnnotationBox({ title, items }) {
+  return (
+    <div style={{
+      width: 280,
+      fontFamily: 'var(--f-mono)',
+      fontSize: 11,
+      lineHeight: 1.7,
+      color: 'var(--bone-soft)',
+      letterSpacing: '0.02em',
+    }}>
+      <p style={{ color: 'var(--caramel)', letterSpacing: '0.12em', textTransform: 'uppercase', fontSize: 10, marginBottom: 12 }}>
+        {title}
+      </p>
+      <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {items.map((item, i) => (
+          <li key={i} style={{ display: 'flex', gap: 8 }}>
+            <span style={{ color: 'var(--caramel)', flexShrink: 0 }}>·</span>
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+// ── Root ──────────────────────────────────────────────────────────
+function App() {
+  return (
+    <>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'flex-start' }}>
+        <div style={{
+          fontFamily: 'var(--f-mono)', fontSize: 10,
+          letterSpacing: '0.18em', color: 'var(--bone-dim)',
+          textTransform: 'uppercase', paddingBottom: 4,
+          borderBottom: '1px solid var(--rule)',
+        }}>
+          Live Band Test · BandCombobox design demo
+        </div>
+        <LiveBandTest />
+        <div style={{ fontFamily: 'var(--f-mono)', fontSize: 10, color: 'var(--bone-dim)', letterSpacing: '0.06em' }}>
+          ↑ interactive · toggle test mode on, then pick a band
+        </div>
+      </div>
+
+      <AnnotationBox
+        title="Behaviour notes"
+        items={[
+          'Bands pre-sorted by pick count (most popular first)',
+          'Type anywhere in the input to filter in real time',
+          'Arrow keys navigate, Enter selects, Escape closes',
+          'Active band shown in the status pill (◆ ACTIVE)',
+          '"Set Band →" only enables when selection ≠ saved value',
+          'Whole picker row dims when Test mode is off',
+          'Empty query = full list; no match = "No bands match" hint',
+          'Picks count shown dimly right-aligned in each row',
+        ]}
+      />
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

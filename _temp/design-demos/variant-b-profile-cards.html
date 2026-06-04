@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variant B — Profile Cards</title>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:        #0d0d10;
+    --ink-soft:   #1a1a1f;
+    --charcoal:   #2a2a30;
+    --slate:      #3f4d60;
+    --slate-deep: #2d3845;
+    --slate-mid:  #364455;
+    --bone:       #f2ebde;
+    --bone-soft:  #c8bfaf;
+    --bone-dim:   rgba(242,235,222,0.45);
+    --caramel:    #d97b2c;
+    --caramel-hot:#f3953f;
+    --blood:      #c01e1e;
+    --rule:       rgba(242,235,222,0.10);
+    --rule-slate: rgba(63,77,96,0.6);
+    --f-body: "Space Grotesk", sans-serif;
+    --f-mono: "JetBrains Mono", monospace;
+    --f-pop:  "Bungee", sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--ink);
+    color: var(--bone);
+    font-family: var(--f-body);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .outer-card {
+    background: var(--ink-soft);
+    border: 1px solid var(--rule);
+    padding: 20px;
+    margin: 40px auto;
+    max-width: 1100px;
+  }
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;
+  }
+  .card-id { font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--bone-dim); }
+  .card-status { font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #22c55e; }
+  .card-title { font-family: var(--f-pop); font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--bone); margin-bottom: 4px; }
+  .card-desc { font-family: var(--f-mono); font-size: 11px; line-height: 1.6; color: var(--bone-soft); letter-spacing: 0.02em; margin-bottom: 20px; }
+
+  /* ── User list ── */
+  .user-list { display: flex; flex-direction: column; gap: 2px; }
+
+  /* ── User card ── */
+  .user-card {
+    background: rgba(42,42,48,0.6);
+    border: 1px solid rgba(242,235,222,0.07);
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 48px 1fr auto;
+    gap: 0 16px;
+    align-items: center;
+    transition: border-color 0.12s, background 0.12s;
+  }
+  .user-card:hover { border-color: rgba(242,235,222,0.14); background: rgba(42,42,48,0.9); }
+  .user-card.godlike-card { border-left: 2px solid var(--caramel); }
+  .user-card.confirm-state { background: rgba(192,30,30,0.06); border-color: rgba(192,30,30,0.25); }
+
+  /* avatar */
+  .avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--f-mono); font-size: 13px; font-weight: 500;
+    letter-spacing: 0.04em; flex-shrink: 0;
+  }
+  .av-godlike { background: rgba(217,123,44,0.12); color: var(--caramel); border: 1px solid rgba(217,123,44,0.35); }
+  .av-manager { background: rgba(96,165,250,0.1); color: #60a5fa; border: 1px solid rgba(96,165,250,0.3); }
+  .av-normal  { background: rgba(63,77,96,0.45); color: var(--bone-soft); border: 1px solid rgba(63,77,96,0.7); }
+  .av-test    { background: rgba(63,77,96,0.2); color: rgba(200,191,175,0.5); border: 1px dashed rgba(63,77,96,0.5); }
+
+  /* info block */
+  .user-info { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .info-top { display: flex; align-items: center; gap: 10px; }
+  .user-name { font-family: var(--f-body); font-size: 14px; font-weight: 500; color: var(--bone); }
+  .user-email { font-family: var(--f-mono); font-size: 10px; color: var(--bone-soft); letter-spacing: 0.02em; }
+  .info-tags { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+  /* role badge */
+  .role-badge {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 2px 7px; border: 1px solid;
+  }
+  .rg { color: var(--caramel); border-color: rgba(217,123,44,0.5); background: rgba(217,123,44,0.08); }
+  .rm { color: #60a5fa; border-color: rgba(96,165,250,0.35); background: rgba(96,165,250,0.07); }
+  .rn { color: var(--bone-soft); border-color: rgba(200,191,175,0.22); }
+
+  /* test badge */
+  .test-badge {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 2px 7px; color: rgba(217,123,44,0.6);
+    border: 1px dashed rgba(217,123,44,0.3);
+  }
+
+  /* stat pill */
+  .stat-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: var(--f-mono); font-size: 10px; color: var(--bone-soft);
+    padding: 2px 8px;
+    border: 1px solid rgba(242,235,222,0.08);
+    background: rgba(242,235,222,0.03);
+  }
+  .stat-pill .num { color: var(--bone); font-size: 11px; }
+  .stat-pill .lbl { letter-spacing: 0.06em; text-transform: uppercase; font-size: 8px; color: var(--bone-dim); }
+
+  .friend-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: var(--f-mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 2px 7px; border: 1px solid;
+  }
+  .fp-yes { color: #22c55e; border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.07); }
+  .fp-no  { color: var(--bone-dim); border-color: rgba(242,235,222,0.1); }
+
+  /* ── Controls column ── */
+  .controls {
+    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+  }
+
+  .ctrl-btn {
+    display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; padding: 8px 12px; border: 1px solid; cursor: pointer;
+    background: transparent; transition: background 0.12s, color 0.12s;
+    min-width: 64px;
+  }
+  .ctrl-btn .lbl { font-family: var(--f-mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .ctrl-btn .val { font-family: var(--f-mono); font-size: 10px; font-weight: 500; }
+
+  .cb-on  { border-color: var(--caramel); color: var(--caramel); background: rgba(217,123,44,0.08); }
+  .cb-off { border-color: rgba(242,235,222,0.15); color: var(--bone-soft); }
+  .cb-on:hover  { background: rgba(217,123,44,0.18); }
+  .cb-off:hover { border-color: rgba(242,235,222,0.3); color: var(--bone); background: rgba(242,235,222,0.04); }
+  .cb-disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+
+  .divider { width: 1px; height: 32px; background: var(--rule); flex-shrink: 0; }
+
+  .btn-del {
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    background: transparent; border: 1px solid transparent;
+    color: var(--bone-dim); cursor: pointer; font-size: 14px;
+    transition: border-color 0.12s, color 0.12s;
+  }
+  .btn-del:hover { border-color: var(--blood); color: var(--blood); }
+  .btn-del-hidden { opacity: 0; pointer-events: none; }
+
+  /* Confirm state */
+  .confirm-inline {
+    display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+  }
+  .confirm-msg {
+    font-family: var(--f-mono); font-size: 10px; color: #f87171; letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .confirm-cancel {
+    font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 5px 10px; cursor: pointer; background: transparent;
+    border: 1px solid rgba(242,235,222,0.2); color: var(--bone-soft);
+    transition: border-color 0.1s, color 0.1s;
+  }
+  .confirm-cancel:hover { border-color: var(--bone-soft); color: var(--bone); }
+  .confirm-delete {
+    font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 5px 10px; cursor: pointer; background: transparent;
+    border: 1px solid var(--blood); color: var(--blood);
+    transition: background 0.1s, color 0.1s;
+  }
+  .confirm-delete:hover { background: var(--blood); color: var(--bone); }
+
+  .variant-label { font-family: var(--f-pop); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--caramel); text-align: center; padding: 16px 0 4px; }
+  .variant-desc  { font-family: var(--f-mono); font-size: 10px; color: var(--bone-dim); text-align: center; letter-spacing: 0.05em; padding-bottom: 16px; }
+</style>
+</head>
+<body>
+
+<div class="variant-label">Variant B — Profile Cards</div>
+<div class="variant-desc">Avatar-led cards · role/status tag cluster · action block right · left accent for godlike</div>
+
+<div class="outer-card">
+  <div class="card-header">
+    <span class="card-id">D-01</span>
+    <span class="card-status">● 8 Users</span>
+  </div>
+  <h2 class="card-title">Servants of Metal</h2>
+  <p class="card-desc">Registered users. Manage roles, friend status, and remove non-godlike accounts.</p>
+
+  <div class="user-list">
+
+    <!-- Godlike -->
+    <div class="user-card godlike-card">
+      <div class="avatar av-godlike">SF</div>
+      <div class="user-info">
+        <div class="info-top">
+          <span class="user-name">sfilizzola</span>
+          <span class="user-email">sfilizzola@gmail.com</span>
+        </div>
+        <div class="info-tags">
+          <span class="role-badge rg">Godlike</span>
+          <span class="stat-pill"><span class="num">12</span><span class="lbl">badges</span></span>
+          <span class="friend-pill fp-yes">♥ Friend</span>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="ctrl-btn cb-on cb-disabled"><span class="lbl">Manager</span><span class="val">YES</span></button>
+        <button class="ctrl-btn cb-on cb-disabled"><span class="lbl">Friend</span><span class="val">YES</span></button>
+        <div class="divider"></div>
+        <button class="btn-del btn-del-hidden">✕</button>
+      </div>
+    </div>
+
+    <!-- Manager -->
+    <div class="user-card">
+      <div class="avatar av-manager">MR</div>
+      <div class="user-info">
+        <div class="info-top">
+          <span class="user-name">Marco Rossi</span>
+          <span class="user-email">marco.rossi@icloud.com</span>
+        </div>
+        <div class="info-tags">
+          <span class="role-badge rm">Manager</span>
+          <span class="stat-pill"><span class="num">7</span><span class="lbl">badges</span></span>
+          <span class="friend-pill fp-yes">♥ Friend</span>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="ctrl-btn cb-on"><span class="lbl">Manager</span><span class="val">YES</span></button>
+        <button class="ctrl-btn cb-on"><span class="lbl">Friend</span><span class="val">YES</span></button>
+        <div class="divider"></div>
+        <button class="btn-del">✕</button>
+      </div>
+    </div>
+
+    <!-- Normal -->
+    <div class="user-card">
+      <div class="avatar av-normal">AK</div>
+      <div class="user-info">
+        <div class="info-top">
+          <span class="user-name">Anna Klein</span>
+          <span class="user-email">anna.k@proton.me</span>
+        </div>
+        <div class="info-tags">
+          <span class="role-badge rn">Vira-lata</span>
+          <span class="stat-pill"><span class="num">3</span><span class="lbl">badges</span></span>
+          <span class="friend-pill fp-no">Friend: No</span>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="ctrl-btn cb-off"><span class="lbl">Manager</span><span class="val">NO</span></button>
+        <button class="ctrl-btn cb-off"><span class="lbl">Friend</span><span class="val">NO</span></button>
+        <div class="divider"></div>
+        <button class="btn-del">✕</button>
+      </div>
+    </div>
+
+    <!-- Test user -->
+    <div class="user-card">
+      <div class="avatar av-test">TU</div>
+      <div class="user-info">
+        <div class="info-top">
+          <span class="user-name">test_wacken_2026</span>
+          <span class="user-email">test+wacken2026@test.com</span>
+        </div>
+        <div class="info-tags">
+          <span class="role-badge rn">Vira-lata</span>
+          <span class="test-badge">Test User</span>
+          <span class="stat-pill"><span class="num">0</span><span class="lbl">badges</span></span>
+          <span class="friend-pill fp-no">Friend: No</span>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="ctrl-btn cb-off"><span class="lbl">Manager</span><span class="val">NO</span></button>
+        <button class="ctrl-btn cb-off"><span class="lbl">Friend</span><span class="val">NO</span></button>
+        <div class="divider"></div>
+        <button class="btn-del">✕</button>
+      </div>
+    </div>
+
+    <!-- Confirm state -->
+    <div class="user-card confirm-state">
+      <div class="avatar av-normal" style="opacity: 0.5;">LF</div>
+      <div class="user-info">
+        <div class="info-top">
+          <span class="user-name" style="color: #f87171;">luca.f</span>
+          <span class="user-email">luca.f@gmail.com</span>
+        </div>
+        <div class="info-tags">
+          <span class="role-badge rn">Vira-lata</span>
+          <span class="stat-pill"><span class="num">2</span><span class="lbl">badges</span></span>
+        </div>
+      </div>
+      <div class="confirm-inline">
+        <span class="confirm-msg">Permanently delete luca.f@gmail.com?</span>
+        <button class="confirm-cancel">Cancel</button>
+        <button class="confirm-delete">Delete</button>
+      </div>
+    </div>
+
+    <!-- Another normal -->
+    <div class="user-card">
+      <div class="avatar av-normal">JD</div>
+      <div class="user-info">
+        <div class="info-top">
+          <span class="user-name">Julia Darko</span>
+          <span class="user-email">julia.darko@metal.fm</span>
+        </div>
+        <div class="info-tags">
+          <span class="role-badge rn">Vira-lata</span>
+          <span class="stat-pill"><span class="num">5</span><span class="lbl">badges</span></span>
+          <span class="friend-pill fp-yes">♥ Friend</span>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="ctrl-btn cb-off"><span class="lbl">Manager</span><span class="val">NO</span></button>
+        <button class="ctrl-btn cb-on"><span class="lbl">Friend</span><span class="val">YES</span></button>
+        <div class="divider"></div>
+        <button class="btn-del">✕</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
