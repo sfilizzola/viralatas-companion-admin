@@ -25,3 +25,9 @@ Thumbs.db
 
 # Vite
 *.local
+
+# Temporary design prototypes, HTML demos, screenshots
+_temp/
+
+# Agent-generated plans and specs (internal workflow artifacts)
+docs/superpowers/
