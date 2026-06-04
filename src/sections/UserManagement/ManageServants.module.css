@@ -121,6 +121,32 @@
   overflow: hidden;
   text-overflow: ellipsis;
   margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ── Push antenna indicator ─────────────────────────────────────── */
+.antennaGreen {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: #4ade80;
+  filter: drop-shadow(0 0 3px rgba(74, 222, 128, 0.55));
+  animation: signalPulse 2.8s ease-in-out infinite;
+}
+
+.antennaRed {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--blood);
+  opacity: 0.55;
+}
+
+@keyframes signalPulse {
+  0%, 100% { opacity: 0.55; filter: drop-shadow(0 0 2px rgba(74, 222, 128, 0.3)); }
+  50%       { opacity: 1;    filter: drop-shadow(0 0 5px rgba(74, 222, 128, 0.8)); }
 }
 
 .testDot {

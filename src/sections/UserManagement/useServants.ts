@@ -27,17 +27,23 @@ export function useServants(): UseServantsResult {
       setError(null)
 
       const { data: { user } } = await supabase.auth.getUser()
-      if (!cancelled) setCurrentUserId(user?.id ?? null)
+      const myId = user?.id ?? null
+      if (!cancelled) setCurrentUserId(myId)
 
-      // Fetch users (special_badges[] = live godlike-assigned badges),
-      // and blocked_posters in parallel.
-      const [usersResult, blockedResult] = await Promise.all([
+      // Fetch users, blocked_posters, and push_subscriptions in parallel.
+      // Note: push_subscriptions RLS is "own only" — we only get rows the
+      // currently-authenticated user can see. For the godlike admin this means
+      // their own row is definitive; for all other users has_push = null (unknown).
+      const [usersResult, blockedResult, pushResult] = await Promise.all([
         supabase
           .from('users')
           .select('id, email, display_name, avatar_url, role, is_friend, is_test_user, special_badges')
           .order('created_at', { ascending: false }),
         supabase
           .from('blocked_posters')
+          .select('user_id'),
+        supabase
+          .from('push_subscriptions')
           .select('user_id'),
       ])
 
@@ -54,20 +60,37 @@ export function useServants(): UseServantsResult {
         (blockedResult.data ?? []).map((r: { user_id: string }) => r.user_id)
       )
 
+      // Build a Set of user IDs with confirmed push subscriptions (RLS-limited)
+      const pushSet = new Set<string>(
+        (pushResult.data ?? []).map((r: { user_id: string }) => r.user_id)
+      )
+
       const mapped: Servant[] = (usersResult.data ?? []).map((row: Record<string, unknown>) => {
         const specialBadges = row.special_badges
         const badgeCount = Array.isArray(specialBadges) ? specialBadges.length : 0
+        const rowId = row.id as string
+
+        // Determine push status: confirmed true, confirmed false (own user only), or null (unknown)
+        let hasPush: boolean | null
+        if (pushSet.has(rowId)) {
+          hasPush = true
+        } else if (rowId === myId) {
+          hasPush = false
+        } else {
+          hasPush = null
+        }
 
         return {
-          id: row.id as string,
+          id: rowId,
           email: (row.email as string) ?? '',
           display_name: (row.display_name as string | null) ?? null,
           avatar_url: (row.avatar_url as string | null) ?? null,
           role: (row.role as 'normal' | 'manager' | 'godlike') ?? 'normal',
           is_friend: (row.is_friend as boolean | null) ?? null,
           is_test_user: (row.is_test_user as boolean) ?? false,
-          is_blocked: blockedSet.has(row.id as string),
+          is_blocked: blockedSet.has(rowId),
           badge_count: badgeCount,
+          has_push: hasPush,
         }
       })
 

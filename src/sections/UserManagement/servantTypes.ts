@@ -8,4 +8,6 @@ export interface Servant {
   is_test_user: boolean
   is_blocked: boolean
   badge_count: number
+  // true = confirmed subscription; false = confirmed none (own user only); null = unknown (RLS)
+  has_push: boolean | null
 }

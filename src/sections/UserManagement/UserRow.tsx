@@ -42,6 +42,23 @@ function getRoleLabel(role: Servant['role']): string {
   return 'Vira-lata'
 }
 
+function PushAntenna({ active }: { active: boolean }) {
+  return (
+    <span
+      className={active ? styles.antennaGreen : styles.antennaRed}
+      title={active ? 'Push notifications: enabled' : 'Push notifications: disabled'}
+      aria-label={active ? 'Push enabled' : 'Push disabled'}
+    >
+      {/* Broadcast / signal icon — dot + 2 upper arcs */}
+      <svg width="11" height="10" viewBox="0 0 12 11" fill="none" aria-hidden="true">
+        <circle cx="6" cy="10" r="1" fill="currentColor" />
+        <path d="M 3.5 10 A 2.5 2.5 0 0 1 8.5 10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+        <path d="M 1 10 A 5 5 0 0 1 11 10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      </svg>
+    </span>
+  )
+}
+
 export function UserRow({ servant, isCurrentUser, onToggleFriend, onToggleManager, onToggleBlocked, onDelete, onError }: Props) {
   const [confirming, setConfirming] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -143,7 +160,10 @@ export function UserRow({ servant, isCurrentUser, onToggleFriend, onToggleManage
           {displayName}
           {servant.is_test_user && <span className={styles.testDot} title="test user" />}
         </div>
-        <div className={styles.idEmail}>{servant.email}</div>
+        <div className={styles.idEmail}>
+          {servant.has_push !== null && <PushAntenna active={servant.has_push} />}
+          {servant.email}
+        </div>
       </div>
 
       {/* Role */}
