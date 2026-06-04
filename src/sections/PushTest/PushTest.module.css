@@ -1,0 +1,122 @@
+.subList {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--rule);
+  overflow: hidden;
+}
+
+.colBar {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0;
+  padding: 5px 12px;
+  background: var(--charcoal);
+  border-bottom: 1px solid var(--rule);
+}
+
+.colH {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-dim);
+}
+
+.subRow {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--rule);
+  transition: background 0.1s;
+}
+
+.subRow:last-child {
+  border-bottom: none;
+}
+
+.subRow:hover {
+  background: rgba(242, 235, 222, 0.03);
+}
+
+.rowName {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--bone-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.rowStatus {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  min-width: 80px;
+  text-align: right;
+}
+
+.rowStatusSent    { color: #22c55e; }
+.rowStatusNoSub   { color: #facc15; }
+.rowStatusError   { color: #f87171; }
+.rowStatusIdle    { color: transparent; }
+
+.rowBtn {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--caramel);
+  background: transparent;
+  border: 1px solid rgba(217, 123, 44, 0.35);
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  white-space: nowrap;
+}
+
+.rowBtn:hover:not(:disabled) {
+  background: var(--caramel);
+  color: var(--ink);
+  border-color: var(--caramel);
+}
+
+.rowBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.stateRow {
+  padding: 14px 12px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--bone-dim);
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.skeletonRow {
+  height: 36px;
+  background: linear-gradient(
+    90deg,
+    var(--charcoal) 0%,
+    rgba(63,77,96,0.4) 50%,
+    var(--charcoal) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

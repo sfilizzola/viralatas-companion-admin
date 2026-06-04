@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { FunctionCard } from '../../components/FunctionCard/FunctionCard'
 import { Toggle } from '../../components/Toggle/Toggle'
-import { BandCombobox, type BandOption } from '../../components/BandCombobox/BandCombobox'
+import { BandCombobox } from '../../components/BandCombobox/BandCombobox'
 import { useFeedback } from '../../hooks/useFeedback'
+import { useBands } from '../../hooks/useBands'
 import { supabase } from '../../lib/supabase'
 import styles from '../sections.module.css'
 
@@ -13,9 +14,9 @@ interface LiveBandConfig {
 
 export function LiveBandTest() {
   const { feedback, show } = useFeedback()
+  const { bands } = useBands()
 
   const [config, setConfig]           = useState<LiveBandConfig>({ enabled: false, bandId: null })
-  const [bands, setBands]             = useState<BandOption[]>([])
   const [selectedId, setSelectedId]   = useState<string | null>(null)
   const [loading, setLoading]         = useState(true)
   const [saving, setSaving]           = useState(false)
@@ -24,21 +25,6 @@ export function LiveBandTest() {
   useEffect(() => { configRef.current = config }, [config])
 
   useEffect(() => {
-    supabase
-      .from('bands')
-      .select('id, name, user_picks(count)')
-      .then(({ data, error }) => {
-        if (!error && data) {
-          const sorted: BandOption[] = (data as Array<{
-            id: string
-            name: string
-            user_picks: Array<{ count: number }>
-          }>)
-            .map(b => ({ id: b.id, name: b.name, pickCount: b.user_picks[0]?.count ?? 0 }))
-            .sort((a, b) => b.pickCount - a.pickCount)
-          setBands(sorted)
-        }
-      })
 
     supabase
       .from('live_band_test_config')
